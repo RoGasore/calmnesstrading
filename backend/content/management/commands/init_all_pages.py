@@ -13,6 +13,18 @@ class Command(BaseCommand):
         # Pages à créer
         pages_data = [
             {
+                'slug': 'header',
+                'name': 'Header',
+                'title': 'Header',
+                'description': 'En-tête du site avec navigation et logo'
+            },
+            {
+                'slug': 'footer',
+                'name': 'Footer',
+                'title': 'Footer',
+                'description': 'Pied de page du site avec liens et informations'
+            },
+            {
                 'slug': 'tarifs',
                 'name': 'Tarifs',
                 'title': 'Tarifs',
