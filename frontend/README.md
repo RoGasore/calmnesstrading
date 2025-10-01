@@ -1,86 +1,80 @@
-# Welcome to your Lovable project
+# CALMNESS FI - Formation Trading & Signaux Premium
 
-## Project info
+Application web de trading professionnel avec formations, signaux et gestion de comptes.
 
-**URL**: https://lovable.dev/projects/0c1e19d6-d4e6-423a-925c-d106e5c54225
+## Description
 
-## How can I edit this code?
+CALMNESS FI propose des services de trading professionnels incluant :
+- Formations de trading pour tous niveaux
+- Signaux de trading en temps réel
+- Gestion professionnelle de comptes
+- Analyses techniques et stratégies avancées
 
-There are several ways of editing your application.
+## Technologies
 
-**Use Lovable**
+- **Frontend** : React + TypeScript + Vite
+- **Backend** : Django + Django REST Framework
+- **Base de données** : PostgreSQL
+- **Déploiement** : Vercel (Frontend) + Render (Backend)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0c1e19d6-d4e6-423a-925c-d106e5c54225) and start prompting.
+## Installation et développement
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prérequis
+- Node.js & npm installés
+- Python 3.8+ pour le backend
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
+### Frontend
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Installer les dépendances
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Démarrer le serveur de développement
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Backend
+```sh
+# Installer les dépendances
+pip install -r requirements.txt
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# Appliquer les migrations
+python manage.py migrate
 
-**Use GitHub Codespaces**
+# Créer un compte admin
+python manage.py create_admin
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Démarrer le serveur
+python manage.py runserver
+```
 
-## What technologies are used for this project?
+## Services proposés
 
-This project is built with:
+### Formations
+- Formation Initiation (Gratuit)
+- Formation Basic (199€)
+- Formation Advanced (349€)
+- Formation Elite (799€)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Signaux
+- Signaux Hebdomadaires (30€/semaine)
+- Signaux Mensuels (99€/mois)
+- Historique complet des signaux
+- Export Excel disponible
 
-## How can I deploy this project?
+### Gestion de comptes
+- Gestion Bronze (jusqu'à 5000€)
+- Gestion Silver (jusqu'à 15000€)
+- Gestion Gold (comptes premium)
 
-Simply open [Lovable](https://lovable.dev/projects/0c1e19d6-d4e6-423a-925c-d106e5c54225) and click on Share -> Publish.
+## Déploiement
 
-## Can I connect a custom domain to my Lovable project?
+- **Frontend** : Déployé automatiquement sur Vercel
+- **Backend** : Déployé sur Render
+- **Domaine** : https://calmnesstrading.vercel.app
 
-Yes, you can!
+## Contact
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-
-
-
-
-
-
-
-
-
-modifications :
-
-pour les signaux on aura deux types hebdomadaire a 30$ et mensuel a 99$
-signaux en direct tu enleves on garde l'historique avec la posibilite de tout voir sous forme de 1 2 3 ... 300 ou de telecharger le fichier excel
+Pour toute question ou support, contactez-nous via :
+- WhatsApp
+- Telegram
+- Discord
