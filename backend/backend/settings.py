@@ -80,6 +80,9 @@ SIMPLE_JWT = {
 
 # CORS
 _env_cors = [o for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o]
+print(f"DEBUG: CORS_ALLOWED_ORIGINS env var: {os.getenv('CORS_ALLOWED_ORIGINS', 'NOT_SET')}")
+print(f"DEBUG: Parsed env cors: {_env_cors}")
+
 CORS_ALLOWED_ORIGINS = _env_cors or [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
@@ -88,6 +91,8 @@ CORS_ALLOWED_ORIGINS = _env_cors or [
     'https://calmnesstrading.vercel.app',
     'https://calmnesstrading.onrender.com',
 ]
+
+print(f"DEBUG: Final CORS_ALLOWED_ORIGINS: {CORS_ALLOWED_ORIGINS}")
 CORS_ALLOW_CREDENTIALS = False
 
 # Allow overriding to permit all origins in dev via env: CORS_ALLOW_ALL=True
