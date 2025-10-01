@@ -17,6 +17,9 @@ python manage.py init_cms_content
 python manage.py init_header_sections
 python manage.py init_footer_sections
 
+# Synchroniser les vraies données des services (formations, signaux, gestion)
+python manage.py sync_real_data
+
 # Initialiser les données de test pour les paiements
 python manage.py init_test_payments
 
