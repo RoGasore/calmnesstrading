@@ -53,7 +53,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
   ): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await fetchWithAuth('http://127.0.0.1:8000/api/content/cms/translations/generate/', {
+      const response = await fetchWithAuth('https://calmnesstrading.onrender.com/api/content/cms/translations/generate/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
 
   const getSectionTranslations = useCallback(async (sectionId: number): Promise<Translation[]> => {
     try {
-      const response = await fetchWithAuth(`http://127.0.0.1:8000/api/content/cms/translations/section/${sectionId}/`);
+      const response = await fetchWithAuth(`https://calmnesstrading.onrender.com/api/content/cms/translations/section/${sectionId}/`);
       
       if (response.ok) {
         const data = await response.json();
@@ -116,7 +116,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
 
   const updateTranslation = useCallback(async (translationId: number, content: string): Promise<boolean> => {
     try {
-      const response = await fetchWithAuth(`http://127.0.0.1:8000/api/content/cms/translations/${translationId}/`, {
+      const response = await fetchWithAuth(`https://calmnesstrading.onrender.com/api/content/cms/translations/${translationId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
   const regenerateTranslation = useCallback(async (translationId: number): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const response = await fetchWithAuth(`http://127.0.0.1:8000/api/content/cms/translations/${translationId}/regenerate/`, {
+      const response = await fetchWithAuth(`https://calmnesstrading.onrender.com/api/content/cms/translations/${translationId}/regenerate/`, {
         method: 'POST',
       });
 
@@ -191,7 +191,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
 
   const getTranslationStats = useCallback(async () => {
     try {
-      const response = await fetchWithAuth('http://127.0.0.1:8000/api/content/cms/translations/stats/');
+      const response = await fetchWithAuth('https://calmnesstrading.onrender.com/api/content/cms/translations/stats/');
       
       if (response.ok) {
         return await response.json();

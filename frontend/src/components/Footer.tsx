@@ -20,7 +20,7 @@ const Footer = () => {
   const fetchSections = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithAuth('http://127.0.0.1:8000/api/content/cms/pages/public/footer/');
+      const response = await fetchWithAuth('https://calmnesstrading.onrender.com/api/content/cms/pages/public/footer/');
       if (response.ok) {
         const data = await response.json();
         setSections(data.sections || []);
