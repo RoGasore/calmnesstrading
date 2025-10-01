@@ -1,0 +1,189 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Trading Platform Design System - Golden/Yellow Theme */
+
+@layer base {
+  :root {
+    /* Main background and text */
+    --background: 0 0% 100%;
+    --foreground: 225 15% 15%;
+
+    /* Card components */
+    --card: 0 0% 100%;
+    --card-foreground: 225 15% 15%;
+
+    /* Popovers */
+    --popover: 0 0% 100%;
+    --popover-foreground: 225 15% 15%;
+
+    /* Primary - Golden Yellow theme */
+    --primary: 45 95% 55%;
+    --primary-foreground: 225 15% 15%;
+    --primary-glow: 45 100% 70%;
+    --primary-dark: 45 85% 45%;
+
+    /* Secondary - Elegant gray */
+    --secondary: 225 8% 95%;
+    --secondary-foreground: 225 15% 25%;
+
+    /* Muted colors */
+    --muted: 225 8% 95%;
+    --muted-foreground: 225 10% 55%;
+
+    /* Accent - Complementary to primary */
+    --accent: 45 100% 92%;
+    --accent-foreground: 225 15% 25%;
+
+    /* Success - Green for profitable signals */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 70% 90%;
+
+    /* Warning - Orange for alerts */
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Destructive - Red for losses/danger */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders and inputs */
+    --border: 225 15% 88%;
+    --input: 225 15% 90%;
+    --ring: 45 95% 55%;
+
+    /* Premium gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(45 95% 55%), hsl(45 100% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(225 15% 15%), hsl(225 25% 25%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(45 50% 97%));
+
+    /* Shadows with golden glow */
+    --shadow-primary: 0 10px 30px -5px hsl(45 95% 55% / 0.3);
+    --shadow-card: 0 4px 20px -2px hsl(225 15% 15% / 0.1);
+    --shadow-glow: 0 0 40px hsl(45 100% 70% / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode backgrounds */
+    --background: 225 25% 8%;
+    --foreground: 45 100% 95%;
+
+    /* Dark cards with subtle golden tint */
+    --card: 225 20% 10%;
+    --card-foreground: 45 50% 95%;
+
+    /* Dark popovers */
+    --popover: 225 20% 10%;
+    --popover-foreground: 45 50% 95%;
+
+    /* Primary golden in dark mode */
+    --primary: 45 95% 55%;
+    --primary-foreground: 225 25% 8%;
+    --primary-glow: 45 100% 70%;
+    --primary-dark: 45 85% 45%;
+
+    /* Dark secondary */
+    --secondary: 225 15% 15%;
+    --secondary-foreground: 45 50% 90%;
+
+    /* Dark muted */
+    --muted: 225 15% 15%;
+    --muted-foreground: 225 10% 65%;
+
+    /* Dark accent */
+    --accent: 225 15% 15%;
+    --accent-foreground: 45 100% 70%;
+
+    /* Success, warning, destructive remain similar */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 40% 20%;
+
+    --warning: 25 95% 53%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Dark borders and inputs */
+    --border: 225 15% 20%;
+    --input: 225 15% 15%;
+    --ring: 45 95% 55%;
+
+    /* Dark gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(225 25% 8%), hsl(225 20% 12%));
+    --gradient-card: linear-gradient(145deg, hsl(225 20% 10%), hsl(225 15% 12%));
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  }
+}
+
+/* Animations pour les pages Services */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Classes d'animation */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+/* Animation pour les éléments au scroll */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}

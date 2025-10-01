@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:15
+    container_name: pg-django
+    environment:
+      POSTGRES_USER: calmnessAdmin
+      POSTGRES_PASSWORD: calmness1234
+      POSTGRES_DB: calmnessTrading
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

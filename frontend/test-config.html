@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Configuration API</title>
+</head>
+<body>
+    <h1>Test Configuration API</h1>
+    <div id="results"></div>
+    
+    <script>
+        const API_BASE = import.meta.env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+        
+        function testConfiguration() {
+            const resultsDiv = document.getElementById('results');
+            
+            resultsDiv.innerHTML = `
+                <h2>Configuration détectée :</h2>
+                <p><strong>API Base URL:</strong> ${API_BASE}</p>
+                <p><strong>Mode:</strong> ${import.meta.env?.MODE || 'development'}</p>
+                <p><strong>VITE_API_BASE_URL:</strong> ${import.meta.env?.VITE_API_BASE_URL || 'Non défini'}</p>
+                
+                <h2>URLs de test :</h2>
+                <p><strong>Login:</strong> ${API_BASE}/api/auth/login/</p>
+                <p><strong>Admin Users:</strong> ${API_BASE}/api/auth/admin/users/</p>
+                
+                <h2>Test de connectivité :</h2>
+                <button onclick="testConnectivity()">Tester la connectivité</button>
+                <div id="connectivity-results"></div>
+            `;
+        }
+        
+        async function testConnectivity() {
+            const resultsDiv = document.getElementById('connectivity-results');
+            resultsDiv.innerHTML = '<p>Test en cours...</p>';
+            
+            try {
+                // Test de connexion admin
+                const loginResponse = await fetch(`${API_BASE}/api/auth/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@calmnessfi.com',
+                        password: 'calmness'
+                    })
+                });
+                
+                if (loginResponse.ok) {
+                    const loginData = await loginResponse.json();
+                    resultsDiv.innerHTML += '<p>✅ Connexion admin réussie</p>';
+                    
+                    // Test de la liste des utilisateurs
+                    const usersResponse = await fetch(`${API_BASE}/api/auth/admin/users/`, {
+                        headers: {
+                            'Authorization': `Bearer ${loginData.access}`
+                        }
+                    });
+                    
+                    if (usersResponse.ok) {
+                        const usersData = await usersResponse.json();
+                        resultsDiv.innerHTML += `<p>✅ Liste des utilisateurs récupérée: ${usersData.length} utilisateurs</p>`;
+                    } else {
+                        resultsDiv.innerHTML += `<p>❌ Erreur récupération utilisateurs: ${usersResponse.status}</p>`;
+                    }
+                } else {
+                    resultsDiv.innerHTML += `<p>❌ Erreur de connexion: ${loginResponse.status}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `<p>❌ Erreur: ${error.message}</p>`;
+            }
+        }
+        
+        // Lancer le test au chargement de la page
+        testConfiguration();
+    </script>
+</body>
+</html>
