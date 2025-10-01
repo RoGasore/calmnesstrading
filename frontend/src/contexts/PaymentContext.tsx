@@ -175,7 +175,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetch(`${API_BASE}/api/payments/offers/`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des offres');
@@ -196,7 +196,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const fetchOffersByType = useCallback(async (type: string): Promise<Offer[]> => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetch(`${API_BASE}/api/payments/offers/`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des offres');
@@ -219,7 +219,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetch(`${API_BASE}/api/payments/contact-channels/`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des canaux de contact');
@@ -250,7 +250,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/pending-payments/create/`, {
         method: 'POST',
         headers: {
@@ -289,7 +289,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/dashboard/`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération du dashboard');
@@ -314,7 +314,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/admin/dashboard/`);
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération du dashboard admin');
@@ -369,7 +369,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/admin/pending-payments/validate/`, {
         method: 'POST',
         headers: {
@@ -414,7 +414,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     setLoading(true);
     setError(null);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/admin/pending-payments/${pendingPaymentId}/cancel/`, {
         method: 'POST',
       });

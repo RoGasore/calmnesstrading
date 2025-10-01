@@ -10,7 +10,7 @@ export function TestAPI() {
 
   const testStatsAPI = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       console.log('Testing API with base:', API_BASE);
       
       const response = await fetchWithAuth(`${API_BASE}/api/auth/admin/overview/stats/`);
@@ -31,7 +31,7 @@ export function TestAPI() {
 
   const testPaymentsAPI = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       console.log('Testing Payments API with base:', API_BASE);
       
       const response = await fetchWithAuth(`${API_BASE}/api/payments/admin/dashboard/`);
@@ -52,7 +52,7 @@ export function TestAPI() {
 
   const testActivityAPI = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       console.log('Testing Activity API with base:', API_BASE);
       
       const response = await fetchWithAuth(`${API_BASE}/api/auth/admin/overview/activity/`);

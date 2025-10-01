@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://calmnesstrading.onrender.com";
 
 const VerifyEmail = () => {
   const [params] = useSearchParams();

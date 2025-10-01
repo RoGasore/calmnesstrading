@@ -132,7 +132,7 @@ export function WidgetContainer({ className = "", statsData: propsStatsData, adm
   const [loading, setLoading] = useState(false); // Pas de chargement, on utilise les props
   const [statsData, setStatsData] = useState<any>(propsStatsData);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
 
   const loadWidgets = () => {
     const savedWidgets = localStorage.getItem('admin_widgets');

@@ -11,7 +11,7 @@ export function DebugLoading() {
 
   const testAPI = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/auth/admin/overview/stats/`);
       console.log('API Response:', response.status, response.statusText);
       if (response.ok) {

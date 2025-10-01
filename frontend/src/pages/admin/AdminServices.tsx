@@ -104,7 +104,7 @@ const AdminServices = () => {
   const fetchOffersByType = async (type: string) => {
     setLoading(true);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/admin/offers/?type=${type}`);
       if (!response.ok) throw new Error('Erreur de chargement');
       
@@ -132,7 +132,7 @@ const AdminServices = () => {
     
     setLoading(true);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const url = isEditing && currentOffer.id
         ? `${API_BASE}/api/payments/admin/offers/${currentOffer.id}/`
         : `${API_BASE}/api/payments/admin/offers/`;
@@ -171,7 +171,7 @@ const AdminServices = () => {
     
     setLoading(true);
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
       const response = await fetchWithAuth(`${API_BASE}/api/payments/admin/offers/${currentOffer.id}/`, {
         method: 'DELETE',
       });

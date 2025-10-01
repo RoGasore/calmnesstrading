@@ -97,7 +97,7 @@ const Register = () => {
       return;
     }
 
-    const confirmUrl = `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'http://127.0.0.1:8000'}/api/auth/activate/`;
+    const confirmUrl = `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'https://calmnesstrading.onrender.com'}/api/auth/activate/`;
     const ok = await register({
       username: formData.email,
       email: formData.email,
