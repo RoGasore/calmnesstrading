@@ -66,7 +66,7 @@ class Command(BaseCommand):
             {
                 'section_key': 'footer_copyright',
                 'title': 'Copyright',
-                'content': '© 2024 CALMNESS FI. Tous droits réservés.',
+                'content': '© 2025 CALMNESS FI. Tous droits réservés.',
                 'content_type': 'text',
                 'metadata': {}
             },

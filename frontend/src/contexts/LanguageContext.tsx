@@ -103,7 +103,7 @@ const translations: Translations = {
   'footer.ssl.secured': { fr: 'Sécurisé SSL', en: 'SSL Secured' },
   'footer.certified.experts': { fr: 'Experts Certifiés', en: 'Certified Experts' },
   'footer.support.24.7': { fr: 'Support 24/7', en: '24/7 Support' },
-    'footer.copyright': { fr: '© 2024 CALMNESS FI. Tous droits réservés.', en: '© 2024 CALMNESS FI. All rights reserved.' },
+    'footer.copyright': { fr: '© 2025 CALMNESS FI. Tous droits réservés.', en: '© 2025 CALMNESS FI. All rights reserved.' },
   'footer.risk.warning.title': { fr: 'Avertissement sur les risques :', en: 'Risk Warning:' },
   'footer.risk.warning.text': { 
     fr: 'Le trading de CFD et de devises comporte un niveau de risque élevé et peut ne pas convenir à tous les investisseurs. Vous pourriez perdre tout ou partie de votre capital investi. Les performances passées ne garantissent pas les résultats futurs. Assurez-vous de bien comprendre les risques avant de trader.',
