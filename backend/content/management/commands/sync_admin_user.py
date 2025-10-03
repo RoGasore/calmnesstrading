@@ -11,14 +11,15 @@ class Command(BaseCommand):
             # Créer ou mettre à jour l'utilisateur admin
             admin_user, created = User.objects.get_or_create(
                 username='admin',
-                defaults={
-                    'email': 'admin@calmness.com',
-                    'first_name': 'Admin',
-                    'last_name': 'Calmness',
-                    'is_staff': True,
-                    'is_superuser': True,
-                    'is_active': True
-                }
+                 defaults={
+                     'email': 'admin@calmness.com',
+                     'first_name': 'Admin',
+                     'last_name': 'Calmness',
+                     'is_staff': True,
+                     'is_superuser': True,
+                     'is_active': True,
+                     'is_verified': True
+                 }
             )
             
             if created:
@@ -33,6 +34,7 @@ class Command(BaseCommand):
             admin_user.is_staff = True
             admin_user.is_superuser = True
             admin_user.is_active = True
+            admin_user.is_verified = True  # Marquer l'email comme vérifié
             
             # Définir le mot de passe
             admin_user.set_password('calmness')
@@ -48,6 +50,7 @@ class Command(BaseCommand):
             self.stdout.write(f"- Staff: {admin_user.is_staff}")
             self.stdout.write(f"- Superuser: {admin_user.is_superuser}")
             self.stdout.write(f"- Actif: {admin_user.is_active}")
+            self.stdout.write(f"- Email vérifié: {admin_user.is_verified}")
             
             self.stdout.write(self.style.SUCCESS("\n✅ Synchronisation de l'admin terminée avec succès!"))
             
