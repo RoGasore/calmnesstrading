@@ -31,6 +31,10 @@ python manage.py init_production_cms
 echo "👤 Synchronisation de l'utilisateur admin..."
 python manage.py sync_admin_user
 
+# Initialiser tous les blocs de contenu
+echo "🧱 Initialisation de tous les blocs de contenu..."
+python manage.py init_all_content_blocks
+
 # Démarrer l'application
 echo "🌐 Démarrage du serveur..."
 python manage.py runserver 0.0.0.0:$PORT
