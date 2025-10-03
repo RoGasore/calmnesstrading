@@ -35,6 +35,10 @@ python manage.py sync_admin_user
 echo "🧱 Initialisation de tous les blocs de contenu..."
 python manage.py init_all_content_blocks
 
+# Importer le contenu complet
+echo "📥 Import du contenu complet..."
+python manage.py import_content_to_production
+
 # Démarrer l'application
 echo "🌐 Démarrage du serveur..."
 python manage.py runserver 0.0.0.0:$PORT
