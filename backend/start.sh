@@ -27,6 +27,10 @@ python manage.py collectstatic --noinput
 echo "🏗️  Initialisation des données CMS..."
 python manage.py init_production_cms
 
+# Synchroniser l'utilisateur admin
+echo "👤 Synchronisation de l'utilisateur admin..."
+python manage.py sync_admin_user
+
 # Démarrer l'application
 echo "🌐 Démarrage du serveur..."
 python manage.py runserver 0.0.0.0:$PORT
