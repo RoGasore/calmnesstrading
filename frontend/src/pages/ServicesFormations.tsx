@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, GraduationCap } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,6 +16,10 @@ const ServicesFormations = () => {
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
   const { ref: coursesRef, isVisible: coursesVisible } = useScrollAnimation();
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const defaultFeatures = [
     'Videos HD illimitees',

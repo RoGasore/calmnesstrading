@@ -16,6 +16,11 @@ const ServicesSignaux = () => {
   
   const [offerIds, setOfferIds] = useState<Record<string, number>>({});
 
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Charger les IDs des offres depuis la base de données
   useEffect(() => {
     const loadOffers = async () => {

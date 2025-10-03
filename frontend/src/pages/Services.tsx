@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, TrendingUp, Users, Award, Star, ArrowRight, CheckCircle, Target, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
@@ -13,6 +14,10 @@ const Services = () => {
   const { ref: whyChooseRef, isVisible: whyChooseVisible } = useScrollAnimation();
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const services = [
     {

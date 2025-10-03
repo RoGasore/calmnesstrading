@@ -36,12 +36,6 @@ const adminMenuSections = [
     ]
   },
   {
-    label: "Nos Services",
-    items: [
-      { title: "Nos Services", url: "/admin/services", icon: ShoppingBag },
-    ]
-  },
-  {
     label: "Commerce",
     items: [
       { title: "Paiements", url: "/admin/payments", icon: CreditCard },
@@ -52,8 +46,8 @@ const adminMenuSections = [
     label: "Utilisateurs & Contenu",
     items: [
       { title: "Utilisateurs", url: "/admin/users", icon: Users },
-      { title: "Avis", url: "/admin/reviews", icon: MessageSquare },
-      { title: "Contenu CMS", url: "/admin/content", icon: FileText },
+      { title: "Nos Services", url: "/admin/services", icon: ShoppingBag },
+      { title: "Gestion Contenu", url: "/admin/content-unified", icon: FileText },
     ]
   },
   {
@@ -83,10 +77,10 @@ export function AdminSidebar() {
       collapsible="icon"
     >
       <div className="p-4 border-b">
-        <SidebarTrigger className="mb-2" />
-        {!collapsed && (
-          <h2 className="font-bold text-lg text-primary">Admin Panel</h2>
-        )}
+        <div className="flex items-center space-x-3">
+          <SidebarTrigger />
+          <h2 className="font-bold text-base text-primary">Admin Panel</h2>
+        </div>
       </div>
 
       <SidebarContent>

@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
+import { API_CONFIG } from "@/config/api";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -97,7 +98,7 @@ const Register = () => {
       return;
     }
 
-    const confirmUrl = `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || 'https://calmnesstrading.onrender.com'}/api/auth/activate/`;
+    const confirmUrl = `${API_CONFIG.BASE_URL.replace(/\/$/, '')}/api/auth/activate/`;
     const ok = await register({
       username: formData.email,
       email: formData.email,

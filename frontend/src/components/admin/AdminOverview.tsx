@@ -18,7 +18,7 @@ export function AdminOverview() {
   const [statsData, setStatsData] = useState<any>(null);
   const [activityData, setActivityData] = useState<any>(null);
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
   
   // Refs pour éviter les dépendances instables
   const fetchWithAuthRef = useRef(fetchWithAuth);

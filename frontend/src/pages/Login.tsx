@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import TestCredentials from "@/components/TestCredentials";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,7 +70,6 @@ const Login = () => {
         <Header />
         <main className="pt-20 pb-20">
         <div className="container mx-auto px-4 flex flex-col items-center justify-center min-h-[calc(100vh-10rem)]">
-          <TestCredentials />
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-primary">

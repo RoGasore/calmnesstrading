@@ -7,7 +7,6 @@ import AdminServices from "./admin/AdminServices";
 import AdminPayments from "./admin/AdminPayments";
 import AdminRevenue from "./admin/AdminRevenue";
 import { UsersManagement } from "@/components/admin/UsersManagement";
-import { DebugUsersManagement } from "@/components/admin/DebugUsersManagement";
 import { ReviewsManagement } from "@/components/admin/ReviewsManagement";
 import { AnalyticsPage } from "@/components/admin/AnalyticsPage";
 import { RevenueManagement } from "@/components/admin/RevenueManagement";
@@ -15,6 +14,17 @@ import { FormationsManagement } from "@/components/admin/FormationsManagement";
 import { SignauxManagement } from "@/components/admin/SignauxManagement";
 import { GestionManagement } from "@/components/admin/GestionManagement";
 import { ContentManagement } from "@/components/admin/ContentManagement";
+import ContentManagementNew from "./admin/ContentManagement";
+import ContentManagementUnified from "./admin/content/ContentManagement";
+import GlobalSettings from "./admin/content/GlobalSettings";
+import HomePage from "./admin/content/HomePage";
+import HeaderPage from "./admin/content/HeaderPage";
+import FooterPage from "./admin/content/FooterPage";
+import ServicesPage from "./admin/content/ServicesPage";
+import TestimonialsPage from "./admin/content/TestimonialsPage";
+import FAQPage from "./admin/content/FAQPage";
+import ContactPage from "./admin/content/ContactPage";
+import ReviewsPage from "./admin/content/ReviewsPage";
 import { NotificationsManagement } from "@/components/admin/NotificationsManagement";
 import { SecuritySettings } from "@/components/admin/SecuritySettings";
 import { GeneralSettings } from "@/components/admin/GeneralSettings";
@@ -25,16 +35,32 @@ const Admin = () => {
   const { user, isAdmin } = useAuth();
   const { language } = useLanguage();
   const navigate = useNavigate();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   // Redirection si pas admin
   useEffect(() => {
-    if (!isAdmin()) {
-      navigate("/");
+    // Attendre que l'utilisateur soit chargé avant de vérifier
+    if (user !== null) {
+      setIsCheckingAuth(false);
+      if (!isAdmin()) {
+        navigate("/");
+      }
     }
-  }, [isAdmin, navigate]);
+  }, [user, isAdmin, navigate]);
 
+  // Afficher un loader pendant la vérification d'authentification
+  if (isCheckingAuth || user === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Vérification des permissions...</p>
+        </div>
+      </div>
+    );
+  }
 
-
+  // Ne pas rendre si l'utilisateur n'est pas admin
   if (!isAdmin()) {
     return null;
   }
@@ -45,7 +71,6 @@ const Admin = () => {
       <Routes>
         <Route path="/" element={<AdminOverview />} />
         <Route path="/users" element={<UsersManagement />} />
-        <Route path="/debug-users" element={<DebugUsersManagement />} />
         <Route path="/services" element={<AdminServices />} />
         <Route path="/payments" element={<AdminPayments />} />
         <Route path="/revenue" element={<AdminRevenue />} />
@@ -55,6 +80,17 @@ const Admin = () => {
         <Route path="/gestion" element={<GestionManagement />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/content" element={<ContentManagement />} />
+        <Route path="/content-new" element={<ContentManagementNew />} />
+        <Route path="/content-unified" element={<ContentManagementUnified />} />
+        <Route path="/content/global" element={<GlobalSettings />} />
+        <Route path="/content/home" element={<HomePage />} />
+        <Route path="/content/header" element={<HeaderPage />} />
+        <Route path="/content/footer" element={<FooterPage />} />
+        <Route path="/content/services" element={<ServicesPage />} />
+        <Route path="/content/testimonials" element={<TestimonialsPage />} />
+        <Route path="/content/faq" element={<FAQPage />} />
+        <Route path="/content/contact" element={<ContactPage />} />
+        <Route path="/content/reviews" element={<ReviewsPage />} />
         <Route path="/notifications" element={<NotificationsManagement />} />
         <Route path="/security" element={<SecuritySettings />} />
         <Route path="/settings" element={<GeneralSettings />} />

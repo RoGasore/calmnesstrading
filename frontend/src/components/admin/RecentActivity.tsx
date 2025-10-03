@@ -37,7 +37,7 @@ export function RecentActivity({ activityData: propsActivityData }: RecentActivi
   const { fetchWithAuth } = useAuth();
   const { toast } = useToast();
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
   // Mettre à jour activityData quand les props changent
   useEffect(() => {

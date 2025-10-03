@@ -25,7 +25,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
-import Services from "./pages/Services";
+import Services from "./components/ServicesCMS";
 import ServicesFormations from "./pages/ServicesFormations";
 import ServicesSignaux from "./pages/ServicesSignaux";
 import ServicesGestion from "./pages/ServicesGestion";

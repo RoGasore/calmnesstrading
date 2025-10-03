@@ -30,7 +30,9 @@ interface ContentChange {
 
 const EditModeContext = createContext<EditModeContextType | undefined>(undefined);
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
+import { API_CONFIG } from '@/config/api';
+
+const API_BASE = API_CONFIG.BASE_URL;
 
 export const EditModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAdmin, fetchWithAuth } = useAuth();

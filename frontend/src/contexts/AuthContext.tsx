@@ -22,7 +22,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
+import { API_CONFIG } from '@/config/api';
+
+const API_BASE = API_CONFIG.BASE_URL;
 
 let inMemoryAccessToken: string | null = null;
 
@@ -65,19 +67,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 	useEffect(() => {
 		const savedUser = localStorage.getItem('user_profile');
-		if (savedUser) {
-			try { setUser(JSON.parse(savedUser)); } catch { localStorage.removeItem('user_profile'); }
+		const savedRefreshToken = localStorage.getItem('refresh_token');
+		
+		if (savedUser && savedRefreshToken) {
+			try { 
+				setUser(JSON.parse(savedUser)); 
+				// Essayer de restaurer le token d'accès
+				tryRefreshToken();
+			} catch { 
+				localStorage.removeItem('user_profile');
+				localStorage.removeItem('refresh_token');
+			}
 		}
 	}, []);
 
 	const login = async (email: string, password: string): Promise<boolean> => {
+		console.log('🔐 Login attempt:', { email, password: '***', apiBase: API_BASE });
 		const res = await fetch(`${API_BASE}/api/auth/login/`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email, password })
 		});
+		console.log('📡 Login response:', res.status, res.statusText);
 		if (!res.ok) {
 			const errorData = await res.json().catch(() => ({}));
+			console.log('❌ Login error:', errorData);
 			throw new Error(errorData.detail || 'Erreur de connexion');
 		}
 		const data = await res.json();

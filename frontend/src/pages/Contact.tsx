@@ -2,40 +2,32 @@ import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Mail, Clock, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { EditableLayout } from "@/components/cms/EditableLayout";
+import ContactFormDynamic from "@/components/ContactFormDynamic";
 
 const Contact = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
-  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would normally send the form data to your backend
-    toast({
-      title: t2('contact.form.success.title'),
-      description: t2('contact.form.success.message'),
-    });
-    setFormData({ name: "", email: "", subject: "", message: "" });
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+  const handleFormSubmit = async (formData: Record<string, any>) => {
+    try {
+      // Ici vous pouvez envoyer les données à votre backend
+      console.log('Données du formulaire:', formData);
+      
+      // Simulation d'envoi
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: t2('contact.form.success.title'),
+        description: t2('contact.form.success.message'),
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi:', error);
+      throw error;
+    }
   };
 
   const translations = {
@@ -152,57 +144,7 @@ const Contact = () => {
                   <CardTitle>{t2('contact.form.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">{t2('contact.form.name')}</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email">{t2('contact.form.email')}</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">{t2('contact.form.subject')}</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="message">{t2('contact.form.message')}</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        rows={5}
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    
-                    <Button type="submit" className="w-full">
-                      {t2('contact.form.send')}
-                    </Button>
-                  </form>
+                  <ContactFormDynamic onSubmit={handleFormSubmit} />
                 </CardContent>
               </Card>
             </div>

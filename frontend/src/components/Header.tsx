@@ -5,6 +5,7 @@ import { useTheme } from "@/contexts/ThemeProvider";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEditMode } from "@/contexts/EditModeContext";
+import { API_URLS } from "@/config/api";
 import { Link, NavLink } from "react-router-dom";
 import UserMenu from "./UserMenu";
 import ServicesDropdown from "./ServicesDropdown";
@@ -17,12 +18,13 @@ const Header = () => {
   const { isAuthenticated, fetchWithAuth } = useAuth();
   const { refreshTrigger } = useEditMode();
   const [sections, setSections] = useState<any[]>([]);
+  const [globalSettings, setGlobalSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   const fetchSections = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithAuth('https://calmnesstrading.onrender.com/api/content/cms/pages/public/header/');
+      const response = await fetchWithAuth(API_URLS.PAGE_PUBLIC('header'));
       if (response.ok) {
         const data = await response.json();
         setSections(data.sections || []);
@@ -34,13 +36,27 @@ const Header = () => {
     }
   };
 
+  const fetchGlobalSettings = async () => {
+    try {
+      const response = await fetch(API_URLS.GLOBAL_SETTINGS_PUBLIC);
+      if (response.ok) {
+        const data = await response.json();
+        setGlobalSettings(data);
+      }
+    } catch (error) {
+      console.error('Error fetching global settings:', error);
+    }
+  };
+
   useEffect(() => {
     fetchSections();
+    fetchGlobalSettings();
   }, []);
 
   useEffect(() => {
     if (refreshTrigger > 0) {
       fetchSections();
+      fetchGlobalSettings();
     }
   }, [refreshTrigger, fetchWithAuth]);
 
@@ -73,16 +89,19 @@ const Header = () => {
       )}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
-            <EditableText
-              value={getSectionContent('header_logo', 'CALMNESS FI')}
-              sectionId={getSectionId('header_logo', 100)}
-              fieldName="content"
-              className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent"
-            />
+          <div className="flex items-center space-x-3">
+            <img src="/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+            <div className="flex flex-col">
+              <EditableText
+                value={getSectionContent('header_logo', globalSettings.site_name || 'CALMNESS FI')}
+                sectionId={getSectionId('header_logo', 100)}
+                fieldName="content"
+                className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent"
+              />
+              <span className="text-xs text-muted-foreground">Trading Professionnel</span>
+            </div>
           </div>
 
           {/* Desktop Navigation */}

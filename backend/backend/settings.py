@@ -78,6 +78,9 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
 }
 
+# API Configuration
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000')
+
 # CORS
 _env_cors = [o for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o]
 CORS_ALLOWED_ORIGINS = _env_cors or [
@@ -140,17 +143,14 @@ DB_PASSWORD = os.getenv('POSTGRES_PASSWORD') or os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('POSTGRES_HOST', 'localhost')
 DB_PORT = os.getenv('POSTGRES_PORT', '5432')
 
-if not all([DB_NAME, DB_USER, DB_PASSWORD]):
-    raise RuntimeError('PostgreSQL credentials are not set. Define POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD (and optionally POSTGRES_HOST, POSTGRES_PORT).')
+# Temporairement en SQLite pour les tests
+# if not all([DB_NAME, DB_USER, DB_PASSWORD]):
+#     raise RuntimeError('PostgreSQL credentials are not set. Define POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD (and optionally POSTGRES_HOST, POSTGRES_PORT).')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 

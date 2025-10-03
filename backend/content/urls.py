@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views, views_cms
 
 urlpatterns = [
@@ -50,4 +50,7 @@ urlpatterns = [
     path('cms/translations/section/<int:section_id>/', views_cms.get_section_translations, name='cms_section_translations'),
     path('cms/translations/stats/', views_cms.get_translation_stats, name='cms_translation_stats'),
     path('cms/translations/<int:translation_id>/regenerate/', views_cms.regenerate_translation, name='cms_regenerate_translation'),
+    
+    # CMS Complet - Nouveau système
+    path('comprehensive-cms/', include('content.urls_comprehensive_cms')),
 ]

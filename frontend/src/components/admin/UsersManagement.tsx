@@ -49,7 +49,7 @@ interface User {
   last_login?: string;
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://calmnesstrading.onrender.com';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export function UsersManagement() {
   const [users, setUsers] = useState<User[]>([]);
