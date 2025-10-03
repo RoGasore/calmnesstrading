@@ -1,27 +1,32 @@
 #!/bin/bash
+
 # Script de démarrage pour Render
+echo "🚀 Démarrage de l'application Django..."
 
-# Exécuter les migrations
-python manage.py migrate
+# Activer l'environnement virtuel s'il existe
+if [ -d "venv" ]; then
+    echo "📦 Activation de l'environnement virtuel..."
+    source venv/bin/activate
+fi
 
-# Créer un compte admin s'il n'existe pas
-python manage.py create_admin
+# Installer les dépendances si requirements.txt existe
+if [ -f "requirements.txt" ]; then
+    echo "📦 Installation des dépendances..."
+    pip install -r requirements.txt
+fi
 
-# Initialiser les pages CMS
-python manage.py init_all_pages
+# Appliquer les migrations
+echo "🗄️  Application des migrations..."
+python manage.py migrate --noinput
 
-# Initialiser le contenu CMS (formations, services, etc.)
-python manage.py init_cms_content
+# Collecter les fichiers statiques
+echo "📁 Collecte des fichiers statiques..."
+python manage.py collectstatic --noinput
 
-# Initialiser les sections header et footer
-python manage.py init_header_sections
-python manage.py init_footer_sections
+# Initialiser les données CMS
+echo "🏗️  Initialisation des données CMS..."
+python manage.py init_production_cms
 
-# Synchroniser les vraies données des services (formations, signaux, gestion)
-python manage.py sync_real_data
-
-# Initialiser les données de test pour les paiements
-python manage.py init_test_payments
-
-# Démarrer le serveur
+# Démarrer l'application
+echo "🌐 Démarrage du serveur..."
 python manage.py runserver 0.0.0.0:$PORT
