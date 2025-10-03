@@ -244,7 +244,7 @@ const HomePageNew: React.FC = () => {
                 onClick={() => setShowCommunityPopup(true)}
               >
                 <Users className="h-5 w-5 mr-2" />
-                {getBlockContent('hero_cta1', 'Rejoindre notre communauté')}
+                {getBlockContent('hero_cta1', 'Rejoignez notre communauté')}
               </Button>
               
               <Button 
@@ -253,7 +253,7 @@ const HomePageNew: React.FC = () => {
                 className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={() => scrollToSection('solutions')}
               >
-                {getBlockContent('hero_cta2', 'Voir nos services')}
+                {getBlockContent('hero_cta2', 'Nos offres')}
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </motion.div>
@@ -499,7 +499,7 @@ const HomePageNew: React.FC = () => {
                 onClick={() => setShowCommunityPopup(true)}
               >
                 <Users className="h-5 w-5 mr-2" />
-                {getBlockContent('final_cta1', 'Commencer maintenant')}
+                {getBlockContent('final_cta1', 'Rejoignez notre communauté')}
               </Button>
               
               <Button 

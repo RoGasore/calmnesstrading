@@ -269,8 +269,8 @@ const HomePage: React.FC = () => {
         { key: 'hero_main_title', label: 'Titre principal', defaultValue: 'Mange. Dors. Trade. Répète.' },
         { key: 'hero_subtitle', label: 'Sous-titre', defaultValue: 'La routine qui peut transformer votre vie.' },
         { key: 'hero_description', label: 'Description', defaultValue: 'Formez-vous. Copiez nos signaux. Confiez-nous votre compte.' },
-        { key: 'hero_cta1', label: 'Bouton 1', defaultValue: 'Rejoindre notre communauté' },
-        { key: 'hero_cta2', label: 'Bouton 2', defaultValue: 'Voir nos services' }
+        { key: 'hero_cta1', label: 'Bouton 1', defaultValue: 'Rejoignez notre communauté' },
+        { key: 'hero_cta2', label: 'Bouton 2', defaultValue: 'Nos offres' }
       ]
     },
     {
@@ -333,8 +333,8 @@ const HomePage: React.FC = () => {
       description: "Appel à l'action de fin de page",
       blocks: [
         { key: 'final_cta_title', label: 'Titre CTA', defaultValue: 'Prêt à transformer votre façon de trader ?' },
-        { key: 'final_cta1', label: 'Bouton CTA 1', defaultValue: 'Commencer maintenant' },
-        { key: 'final_cta2', label: 'Bouton CTA 2', defaultValue: 'Découvrir nos offres' }
+        { key: 'final_cta1', label: 'Bouton CTA 1', defaultValue: 'Rejoignez notre communauté' },
+        { key: 'final_cta2', label: 'Bouton CTA 2', defaultValue: 'Nos offres' }
       ]
     },
     {

@@ -364,7 +364,7 @@ const HomePageWorking: React.FC = () => {
                 className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={() => setShowCommunityPopup(true)}
               >
-                {getBlockContent('final_cta1', 'Commencer maintenant')}
+                {getBlockContent('final_cta1', 'Rejoignez nous')}
               </Button>
               
               <Button 
