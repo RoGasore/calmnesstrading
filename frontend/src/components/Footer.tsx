@@ -215,28 +215,6 @@ const Footer = () => {
           </motion.div>
         </div>
 
-        {/* Newsletter Section */}
-        <motion.div 
-          className="py-12 border-t border-border"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-        >
-          <div className="text-center max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4">Restez informé</h3>
-            <p className="text-muted-foreground mb-6">Recevez nos dernières analyses et signaux de trading directement dans votre boîte mail</p>
-            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input 
-                type="email" 
-                placeholder="Votre adresse email" 
-                className="flex-1 px-4 py-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <Button className="bg-primary hover:bg-primary/90 px-6">
-                S'inscrire
-              </Button>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Trust Indicators */}
         <motion.div 
