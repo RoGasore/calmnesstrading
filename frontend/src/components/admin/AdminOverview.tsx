@@ -5,6 +5,7 @@ import { WidgetSettings } from "./widgets/WidgetSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { TrendingUp, Target, Loader2, Shield } from "lucide-react";
 import { usePayment } from "@/contexts/PaymentContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -169,15 +170,10 @@ export function AdminOverview() {
     <div className="space-y-6">
       {/* Bouton Admin Panel pour mobile */}
       <div className="flex justify-end md:hidden">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => window.location.href = '/admin/content'}
-          className="flex items-center gap-2"
-        >
+        <SidebarTrigger className="flex items-center gap-2">
           <Shield className="h-4 w-4" />
           <span>Panel Admin</span>
-        </Button>
+        </SidebarTrigger>
       </div>
       
       {/* Widgets personnalisables */}
