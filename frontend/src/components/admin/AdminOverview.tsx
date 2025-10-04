@@ -4,7 +4,8 @@ import { WidgetContainer } from "./widgets/WidgetContainer";
 import { WidgetSettings } from "./widgets/WidgetSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { TrendingUp, Target, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, Target, Loader2, Shield } from "lucide-react";
 import { usePayment } from "@/contexts/PaymentContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -166,6 +167,19 @@ export function AdminOverview() {
 
   return (
     <div className="space-y-6">
+      {/* Bouton Admin Panel pour mobile */}
+      <div className="flex justify-end md:hidden">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => window.location.href = '/admin/content'}
+          className="flex items-center gap-2"
+        >
+          <Shield className="h-4 w-4" />
+          <span>Panel Admin</span>
+        </Button>
+      </div>
+      
       {/* Widgets personnalisables */}
       <WidgetContainer statsData={statsData} adminDashboard={adminDashboard} />
       
