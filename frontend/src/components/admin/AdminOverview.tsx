@@ -168,11 +168,10 @@ export function AdminOverview() {
 
   return (
     <div className="space-y-6">
-      {/* Bouton Admin Panel pour mobile */}
-      <div className="flex justify-end md:hidden">
-        <SidebarTrigger className="flex items-center gap-2">
-          <Shield className="h-4 w-4" />
-          <span>Panel Admin</span>
+      {/* Bouton Admin Panel fixe pour mobile */}
+      <div className="fixed left-4 top-24 z-50 md:hidden">
+        <SidebarTrigger className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-3 shadow-lg">
+          <Shield className="h-5 w-5" />
         </SidebarTrigger>
       </div>
       
