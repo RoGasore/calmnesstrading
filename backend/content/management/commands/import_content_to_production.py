@@ -110,7 +110,11 @@ class Command(BaseCommand):
                         'is_required': field_data['is_required'],
                         'is_visible': field_data['is_visible'],
                         'order': field_data['order'],
-                        'validation_rules': field_data['validation_rules']
+                        'validation_pattern': field_data.get('validation_pattern', ''),
+                        'validation_message': field_data.get('validation_message', ''),
+                        'options': field_data.get('options', []),
+                        'help_text': field_data.get('help_text', ''),
+                        'css_classes': field_data.get('css_classes', '')
                     }
                 )
                 if created:
