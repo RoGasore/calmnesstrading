@@ -290,13 +290,10 @@ const HomePage: React.FC = () => {
       title: "Section Comment ça marche",
       description: "Processus en 3 étapes",
       blocks: [
-        { key: 'process_title', label: 'Titre de la section', defaultValue: 'Comment ça marche ?' },
-        { key: 'process_step1_title', label: 'Étape 1 - Titre', defaultValue: 'Choisissez votre solution' },
-        { key: 'process_step1_description', label: 'Étape 1 - Description', defaultValue: 'Formation, signaux ou gestion de compte' },
-        { key: 'process_step2_title', label: 'Étape 2 - Titre', defaultValue: 'Suivez nos conseils' },
-        { key: 'process_step2_description', label: 'Étape 2 - Description', defaultValue: 'Apprenez ou copiez nos stratégies' },
-        { key: 'process_step3_title', label: 'Étape 3 - Titre', defaultValue: 'Gagnez régulièrement' },
-        { key: 'process_step3_description', label: 'Étape 3 - Description', defaultValue: 'Voyez vos profits augmenter' }
+        { key: 'how_it_works_title', label: 'Titre de la section', defaultValue: 'Comment ça marche — 3 étapes simples' },
+        { key: 'step_1', label: 'Étape 1 - Description', defaultValue: 'Choisissez votre solution : Formation, Signaux, ou Gestion.' },
+        { key: 'step_2', label: 'Étape 2 - Description', defaultValue: 'Accédez à nos services : suivez, copiez, ou laissez-nous gérer pour vous.' },
+        { key: 'step_3', label: 'Étape 3 - Description', defaultValue: 'Profitez des résultats : compétences, gains, sérénité.' }
       ]
     },
     {
