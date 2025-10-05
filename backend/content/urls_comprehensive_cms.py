@@ -40,6 +40,8 @@ urlpatterns = [
     
     # Public endpoints
     path('public/contact/fields/', views_comprehensive_cms.get_contact_fields_public, name='contact-fields-public'),
+    # Endpoint public pour admin (lecture seule)
+    path('admin/contact/fields/', views_comprehensive_cms.get_contact_fields_public, name='contact-fields-admin-public'),
     
     # Cache management
     path('admin/clear-contact-cache/', views_comprehensive_cms.clear_contact_cache, name='clear-contact-cache'),
