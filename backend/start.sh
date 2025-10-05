@@ -23,21 +23,8 @@ python manage.py migrate --noinput
 echo "📁 Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput
 
-# Initialiser les données CMS
-echo "🏗️  Initialisation des données CMS..."
-python manage.py init_production_cms
-
-# Synchroniser l'utilisateur admin
-echo "👤 Synchronisation de l'utilisateur admin..."
-python manage.py sync_admin_user
-
-# Initialiser tous les blocs de contenu
-echo "🧱 Initialisation de tous les blocs de contenu..."
-python manage.py init_all_content_blocks
-
-# Importer le contenu complet
-echo "📥 Import du contenu complet..."
-python manage.py import_content_to_production
+# Note: Aucune modification de la base de données lors du redémarrage
+# Les données CMS sont gérées via l'interface d'administration
 
 # Démarrer l'application
 echo "🌐 Démarrage du serveur..."
