@@ -50,7 +50,7 @@ export const API_CONFIG = {
       TESTIMONIALS_PUBLIC: '/api/content/comprehensive-cms/public/testimonials/',
       FAQ_PUBLIC: '/api/content/comprehensive-cms/public/faq/',
       OFFERS_PUBLIC: '/api/content/comprehensive-cms/public/offers/',
-      CONTACT_FIELDS: '/api/content/comprehensive-cms/contact-fields/',
+      CONTACT_FIELDS: '/api/content/comprehensive-cms/pages/contact/fields/',
       CONTACT_FIELDS_PUBLIC: '/api/content/comprehensive-cms/public/contact/fields/',
       CLEAR_CONTACT_CACHE: '/api/content/comprehensive-cms/admin/clear-contact-cache/',
       
