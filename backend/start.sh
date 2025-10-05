@@ -23,8 +23,11 @@ python manage.py migrate --noinput
 echo "📁 Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput
 
-# Note: Aucune modification de la base de données lors du redémarrage
-# Les données CMS sont gérées via l'interface d'administration
+# Synchroniser l'utilisateur admin (essentiel pour l'accès admin)
+echo "👤 Synchronisation de l'utilisateur admin..."
+python manage.py sync_admin_user
+
+# Note: Les données CMS sont gérées via l'interface d'administration
 
 # Démarrer l'application
 echo "🌐 Démarrage du serveur..."
