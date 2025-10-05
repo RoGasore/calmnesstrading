@@ -15,7 +15,6 @@ const ServicesFormations = () => {
   const { t } = useLanguage();
   const { ref: heroRef, isVisible: heroVisible } = useScrollAnimation();
   const { ref: coursesRef, isVisible: coursesVisible } = useScrollAnimation();
-  const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -82,25 +81,6 @@ const ServicesFormations = () => {
                 icon={GraduationCap}
                 defaultFeatures={defaultFeatures}
               />
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section ref={ctaRef} className="py-16 bg-muted/50">
-          <div className="container mx-auto px-4">
-            <div className={`text-center max-w-2xl mx-auto ${ctaVisible ? 'animate-fade-in-up' : ''}`}>
-              <h2 className="text-3xl font-bold mb-4">{t('formations.cta.title')}</h2>
-              <p className="text-xl text-muted-foreground mb-8">
-                {t('formations.cta.subtitle')}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild size="lg" variant="hero">
-                  <a href="#formations">
-                    {t('formations.cta.button')}
-                  </a>
-                </Button>
-              </div>
             </div>
           </div>
         </section>

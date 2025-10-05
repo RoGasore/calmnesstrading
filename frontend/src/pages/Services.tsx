@@ -12,7 +12,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const Services = () => {
   const { ref: servicesRef, isVisible: servicesVisible } = useScrollAnimation();
   const { ref: whyChooseRef, isVisible: whyChooseVisible } = useScrollAnimation();
-  const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation();
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -277,29 +276,6 @@ const Services = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section ref={ctaRef} className="py-16">
-          <div className="container mx-auto px-4">
-            <div className={`text-center max-w-2xl mx-auto ${ctaVisible ? 'animate-fade-in-up' : ''}`}>
-              <h2 className="text-3xl font-bold mb-4">{t('services.cta.title')}</h2>
-              <p className="text-xl text-muted-foreground mb-8">
-                {t('services.cta.subtitle')}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button asChild size="lg" variant="hero">
-                  <Link to="/services/formations">
-                    {t('services.cta.formations')}
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link to="/services/signaux">
-                    {t('services.cta.signals')}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <Footer />
