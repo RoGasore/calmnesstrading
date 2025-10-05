@@ -204,7 +204,7 @@ const ServicesPage: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            page_id: servicesPageId,
+            page: servicesPageId,
             block_key: block.block_key,
             content: block.content,
             content_type: block.content_type,
@@ -302,7 +302,7 @@ const ServicesPage: React.FC = () => {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              page_id: servicesPageId, // ID de la page
+              page: servicesPageId, // ID de la page
               block_key: block.block_key,
               content: block.content,
               content_type: block.content_type,

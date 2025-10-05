@@ -193,7 +193,7 @@ const HomePage: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            page_id: homePageId,
+            page: homePageId,
             block_key: block.block_key,
             content: block.content,
             content_type: block.content_type,
