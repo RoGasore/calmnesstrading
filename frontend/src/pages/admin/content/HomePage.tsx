@@ -338,8 +338,8 @@ const HomePage: React.FC = () => {
       title: "Section Avertissement",
       description: "Disclaimer et mentions légales",
       blocks: [
-        { key: 'disclaimer_title', label: 'Titre Avertissement', defaultValue: 'Avertissement' },
-        { key: 'disclaimer_text', label: 'Texte Avertissement', defaultValue: 'Le trading comporte des risques. Les performances passées ne préjugent pas des résultats futurs.' }
+        { key: 'disclaimer_title', label: 'Titre Avertissement', defaultValue: 'Avertissement / Disclaimer' },
+        { key: 'disclaimer_text', label: 'Texte Avertissement', defaultValue: 'Le trading comporte des risques.' }
       ]
     }
   ];
