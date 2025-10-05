@@ -107,7 +107,7 @@ const HomePage: React.FC = () => {
     setContentBlocks(prev => {
       if (!Array.isArray(prev)) {
         return [{
-          id: Date.now(),
+          id: 0, // ID temporaire pour nouveau bloc
           block_key: key,
           content,
           content_type: 'text',
@@ -126,7 +126,7 @@ const HomePage: React.FC = () => {
       } else {
         // Créer un nouveau bloc si il n'existe pas
         const newBlock: ContentBlock = {
-          id: Date.now(), // ID temporaire
+          id: 0, // ID temporaire pour nouveau bloc
           block_key: key,
           content,
           content_type: 'text',
@@ -164,7 +164,7 @@ const HomePage: React.FC = () => {
     try {
       setSavingBlocks(prev => new Set(prev).add(blockKey));
       
-      if (block.id && typeof block.id === 'number' && block.id > 10) {
+      if (block.id && typeof block.id === 'number' && block.id > 0) {
         // Bloc existant - mise à jour
         console.log(`Mise à jour du bloc ${blockKey} (ID: ${block.id})`);
         const response = await fetchWithAuth(API_URLS.CMS_CONTENT_BLOCKS_UPDATE_CONTENT(block.id), {
