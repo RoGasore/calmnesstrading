@@ -18,7 +18,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <SidebarProvider>
           <div className="flex min-h-[calc(100vh-5rem)] w-full">
             <AdminSidebar />
-            <main className="flex-1">
+            <main className="flex-1 p-6">
               {children}
             </main>
           </div>

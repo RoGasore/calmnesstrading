@@ -88,16 +88,6 @@ const AdminServices = () => {
       borderColor: 'border-green-500/30',
       iconBg: 'bg-green-500/20',
       iconColor: 'text-green-600'
-    },
-    {
-      type: 'subscription',
-      title: 'Abonnements',
-      description: 'Gérer les abonnements et accès premium',
-      icon: TrendingUp,
-      color: 'from-purple-500/20 to-purple-600/20',
-      borderColor: 'border-purple-500/30',
-      iconBg: 'bg-purple-500/20',
-      iconColor: 'text-purple-600'
     }
   ];
 
@@ -238,7 +228,7 @@ const AdminServices = () => {
 
         {/* Vue principale : Sélection du service */}
         {!selectedService ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service, index) => (
               <motion.div
                 key={service.type}
