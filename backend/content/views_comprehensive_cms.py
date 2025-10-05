@@ -550,6 +550,15 @@ def get_page_content_public(request, page_slug):
                 'order': block.order
             }
             for block in content_blocks
+        ],
+        'sections': [
+            {
+                'id': block.id,
+                'section_key': block.block_key,
+                'content': block.content,
+                'title': block.title
+            }
+            for block in content_blocks
         ]
     })
 
