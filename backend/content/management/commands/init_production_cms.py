@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from content.models_comprehensive_cms import SitePage, ContentBlock, GlobalSettings
+from content.models_comprehensive_cms import SitePage, ContentBlock, GlobalSettings, ContactField
 
 class Command(BaseCommand):
     help = 'Initialise les données CMS pour la production'
@@ -11,6 +11,7 @@ class Command(BaseCommand):
             self.create_pages()
             self.create_basic_content_blocks()
             self.create_global_settings()
+            self.create_contact_fields()
             
             self.stdout.write(self.style.SUCCESS("\n✅ Initialisation terminée avec succès!"))
             
@@ -18,11 +19,13 @@ class Command(BaseCommand):
             pages_count = SitePage.objects.count()
             blocks_count = ContentBlock.objects.count()
             settings_count = GlobalSettings.objects.count()
+            fields_count = ContactField.objects.count()
             
             self.stdout.write(f"\nVérification des données créées:")
             self.stdout.write(f"- Pages: {pages_count}")
             self.stdout.write(f"- Blocs de contenu: {blocks_count}")
             self.stdout.write(f"- Paramètres globaux: {settings_count}")
+            self.stdout.write(f"- Champs de contact: {fields_count}")
             
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"❌ Erreur lors de l'initialisation: {str(e)}"))
@@ -219,3 +222,64 @@ class Command(BaseCommand):
                 self.stdout.write(f"✅ Paramètres globaux mis à jour: {', '.join(updated_fields)}")
             else:
                 self.stdout.write("ℹ️  Paramètres globaux déjà configurés")
+
+    def create_contact_fields(self):
+        """Créer les champs de contact par défaut"""
+        contact_fields = [
+            {
+                'field_name': 'name',
+                'field_type': 'text',
+                'field_label': 'Nom complet',
+                'field_placeholder': 'Votre nom complet',
+                'is_required': True,
+                'is_visible': True,
+                'order': 1
+            },
+            {
+                'field_name': 'email',
+                'field_type': 'email',
+                'field_label': 'Adresse email',
+                'field_placeholder': 'votre@email.com',
+                'is_required': True,
+                'is_visible': True,
+                'order': 2
+            },
+            {
+                'field_name': 'phone',
+                'field_type': 'tel',
+                'field_label': 'Téléphone (optionnel)',
+                'field_placeholder': '+33 1 23 45 67 89',
+                'is_required': False,
+                'is_visible': True,
+                'order': 3
+            },
+            {
+                'field_name': 'subject',
+                'field_type': 'text',
+                'field_label': 'Sujet',
+                'field_placeholder': 'Objet de votre message',
+                'is_required': True,
+                'is_visible': True,
+                'order': 4
+            },
+            {
+                'field_name': 'message',
+                'field_type': 'textarea',
+                'field_label': 'Message',
+                'field_placeholder': 'Votre message...',
+                'is_required': True,
+                'is_visible': True,
+                'order': 5
+            }
+        ]
+        
+        for field_data in contact_fields:
+            field, created = ContactField.objects.get_or_create(
+                field_name=field_data['field_name'],
+                defaults=field_data
+            )
+            
+            if created:
+                self.stdout.write(f"✅ Champ de contact créé: {field_data['field_name']}")
+            else:
+                self.stdout.write(f"ℹ️  Champ de contact existant: {field_data['field_name']}")
