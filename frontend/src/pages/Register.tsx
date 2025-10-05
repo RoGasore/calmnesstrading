@@ -99,12 +99,18 @@ const Register = () => {
     }
 
     const confirmUrl = `${API_CONFIG.BASE_URL.replace(/\/$/, '')}/api/auth/activate/`;
+    
+    // Générer un username unique basé sur l'email
+    const username = formData.email.split('@')[0] + '_' + Date.now().toString().slice(-4);
+    
     const ok = await register({
-      username: formData.email,
+      username: username,
       email: formData.email,
       password: formData.password,
       first_name: formData.name.split(' ')[0] || '',
       last_name: formData.name.split(' ').slice(1).join(' ') || '',
+      phone: formData.phone,
+      telegram_username: formData.telegramUsername,
       confirm_url: confirmUrl
     });
     if (ok) {

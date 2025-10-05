@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Menu, X, Sun, Moon, Globe } from "lucide-react";
+import { TrendingUp, Menu, X, Sun, Moon, Globe, Shield } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeProvider";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,7 +15,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
-  const { isAuthenticated, fetchWithAuth } = useAuth();
+  const { isAuthenticated, fetchWithAuth, isAdmin } = useAuth();
   const { refreshTrigger } = useEditMode();
   const [sections, setSections] = useState<any[]>([]);
   const [globalSettings, setGlobalSettings] = useState<any>({});
@@ -390,8 +390,21 @@ const Header = () => {
                   </Button>
                 </div>
               ) : (
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
                   <UserMenu />
+                  {isAdmin() && (
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start" 
+                      onClick={() => {
+                        window.location.href = '/admin';
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Panel Admin</span>
+                    </Button>
+                  )}
                 </div>
               )}
             </nav>
