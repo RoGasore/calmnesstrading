@@ -64,3 +64,4 @@ class Command(BaseCommand):
             self.style.SUCCESS(f'{created_count} nouveaux services créés sur {len(default_services)}')
         )
 
+

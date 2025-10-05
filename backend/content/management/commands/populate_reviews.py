@@ -95,3 +95,4 @@ class Command(BaseCommand):
             self.style.SUCCESS(f'{created_count} nouveaux avis créés sur {len(sample_reviews)}')
         )
 
+
