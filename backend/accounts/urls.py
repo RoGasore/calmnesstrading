@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
-    RegisterView, MeView, activate_email, login_with_email,
+    RegisterView, MeView, activate_email, resend_activation_email, login_with_email,
     AdminUserListView, AdminUserDetailView, admin_activate_user, admin_deactivate_user,
     admin_overview_stats, admin_recent_activity
 )
@@ -16,6 +16,7 @@ urlpatterns = [
     
     # Activation d'email
     path('activate/', activate_email, name='activate_email'),
+    path('resend-activation/', resend_activation_email, name='resend_activation_email'),
     
     # Gestion admin
     path('admin/users/', AdminUserListView.as_view(), name='admin_user_list'),

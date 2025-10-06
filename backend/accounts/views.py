@@ -165,6 +165,139 @@ def activate_email(request):
         return Response({'detail': 'Lien invalide'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def resend_activation_email(request):
+    """Renvoyer l'email d'activation pour un utilisateur"""
+    email = request.data.get('email')
+    if not email:
+        return Response({'detail': 'Email manquant'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Validation de l'email
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError
+    try:
+        validate_email(email)
+    except ValidationError:
+        return Response({'detail': 'Format d\'email invalide'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        # Vérifier si l'utilisateur est déjà activé
+        if user.is_active and user.is_verified:
+            return Response({'detail': 'Compte déjà activé'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Limitation de taux : maximum 3 tentatives par heure
+        from django.core.cache import cache
+        cache_key = f"resend_activation_{email}"
+        attempts = cache.get(cache_key, 0)
+        
+        if attempts >= 3:
+            return Response({'detail': 'Trop de tentatives. Veuillez attendre avant de réessayer.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+        
+        # Incrémenter le compteur
+        cache.set(cache_key, attempts + 1, 3600)  # 1 heure
+        
+        # Supprimer les anciens tokens non utilisés
+        EmailVerificationToken.objects.filter(user=user, is_used=False).delete()
+        
+        # Créer un nouveau token
+        verification_token = EmailVerificationToken.objects.create(user=user)
+        
+        # Construire le lien d'activation
+        frontend_base = settings.FRONTEND_BASE_URL.rstrip('/')
+        activation_link = f"{frontend_base}/verify-email?token={verification_token.token}"
+        
+        # Envoyer l'email
+        site_name = os.getenv('SITE_NAME', 'CALMNESS FI')
+        brand_color = os.getenv('BRAND_COLOR', '#F5B301')
+        logo_url = f"{settings.FRONTEND_BASE_URL.rstrip('/')}/logo.png"
+        
+        subject = f"{site_name} • Confirmez votre e-mail"
+        
+        text_message = (
+            f"Bonjour {user.first_name or user.username},\n\n"
+            f"Merci pour votre inscription à {site_name}. Cliquez sur le lien ci-dessous pour activer votre compte.\n\n"
+            f"Lien d'activation: {activation_link}\n\n"
+            f"Cet e-mail vous a été envoyé par {site_name}. Si vous n'êtes pas à l'origine de cette action, ignorez ce message.\n"
+        )
+        
+        html_message = f"""
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{site_name} • Confirmation d'e-mail</title>
+            <style>
+                body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9fafb; }}
+                .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
+                .header {{ background-color: #f9fafb; padding: 40px 0; text-align: center; border-bottom: 1px solid #e5e7eb; }}
+                .content {{ padding: 24px; }}
+                .button {{ display: inline-block; background-color: {brand_color}; color: #111; text-decoration: none; padding: 12px 20px; border-radius: 10px; font-weight: 600; }}
+                .footer {{ background-color: #f9fafb; padding: 16px 24px; text-align: center; color: #6b7280; font-size: 12px; }}
+            </style>
+        </head>
+        <body>
+            <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+                <tr>
+                    <td align="center" style="padding:0;">
+                        <table role="presentation" style="width:600px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                            <tr>
+                                <td align="center" style="padding:40px 0 30px 0;background:#f9fafb;">
+                                    <img src="{logo_url}" alt="" width="120" style="height:auto;display:block;" />
+                                    <h1 style="margin:0;font-size:24px;line-height:32px;font-family:Arial,sans-serif;color:#111;">{site_name}</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:24px;">
+                                    <p style="margin:0 0 12px 0;color:#111;">Bonjour {user.first_name or user.username},</p>
+                                    <p style="margin:0 0 16px 0;color:#4b5563;">Merci pour votre inscription à <strong>{site_name}</strong>. Cliquez sur le bouton ci-dessous pour activer votre compte.</p>
+                                    <p style="text-align:center;margin:28px 0;">
+                                        <a href="{activation_link}" style="display:inline-block;background:{brand_color};color:#111;text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:600;">Activer mon compte</a>
+                                    </p>
+                                    <p style="margin:0 0 8px 0;color:#6b7280;font-size:12px;">Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :</p>
+                                    <p style="word-break:break-all;color:#2563eb;font-size:12px;">{activation_link}</p>
+                                    <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;" />
+                                    <p style="margin:0;color:#9ca3af;font-size:12px;">Cet e-mail vous a été envoyé par {site_name}. Si vous n'êtes pas à l'origine de cette action, ignorez ce message.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:16px 24px;background:#f9fafb;text-align:center;color:#6b7280;font-size:12px;">© {site_name}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+        
+        try:
+            email_obj = EmailMultiAlternatives(
+                subject=subject,
+                body=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[user.email],
+            )
+            email_obj.attach_alternative(html_message, "text/html")
+            email_obj.send(fail_silently=False)
+            print(f"Email d'activation renvoyé à {user.email}")
+            
+            return Response({
+                'detail': 'Email d\'activation renvoyé avec succès',
+                'email': user.email
+            })
+            
+        except Exception as e:
+            print(f"Erreur lors du renvoi de l'email d'activation: {e}")
+            return Response({'detail': 'Erreur lors de l\'envoi de l\'email'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    except User.DoesNotExist:
+        return Response({'detail': 'Utilisateur non trouvé'}, status=status.HTTP_404_NOT_FOUND)
+
+
 # Vue pour la connexion par email
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
