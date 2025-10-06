@@ -226,7 +226,17 @@ def resend_activation_email(request):
         EmailVerificationToken.objects.filter(user=user, is_used=False).delete()
         
         # Créer un nouveau token
-        verification_token = EmailVerificationToken.objects.create(user=user)
+        from django.utils import timezone
+        from datetime import timedelta
+        import secrets
+        
+        token = secrets.token_urlsafe(32)
+        expires_at = timezone.now() + timedelta(hours=24)
+        verification_token = EmailVerificationToken.objects.create(
+            user=user,
+            token=token,
+            expires_at=expires_at
+        )
         
         # Construire le lien d'activation
         frontend_base = settings.FRONTEND_BASE_URL.rstrip('/')
