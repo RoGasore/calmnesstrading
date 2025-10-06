@@ -37,18 +37,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.is_active = False
         user.is_verified = False
         user.save()
+        print(f"SERIALIZER: Utilisateur créé: {user.email}")
         
         # Créer le profil utilisateur
         UserProfile.objects.create(user=user)
+        print("SERIALIZER: Profil utilisateur créé")
         
         # Créer un token de vérification
         token = secrets.token_urlsafe(32)
         expires_at = timezone.now() + timedelta(hours=24)
-        EmailVerificationToken.objects.create(
+        verification_token = EmailVerificationToken.objects.create(
             user=user,
             token=token,
             expires_at=expires_at
         )
+        print(f"SERIALIZER: Token de vérification créé: {verification_token.token[:10]}...")
         
         return user
 
