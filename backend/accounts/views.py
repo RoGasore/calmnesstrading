@@ -44,9 +44,11 @@ class RegisterView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         user = serializer.save()
+        print(f"Utilisateur créé: {user.email}")
         
         # Récupérer le token de vérification créé dans le serializer
         verification_token = EmailVerificationToken.objects.filter(user=user, is_used=False).first()
+        print(f"Token de vérification trouvé: {verification_token is not None}")
         
         if verification_token:
             # Build activation link
@@ -118,6 +120,7 @@ class RegisterView(generics.CreateAPIView):
             """
 
             try:
+                print(f"Tentative d'envoi d'email à {user.email}")
                 email = EmailMultiAlternatives(
                     subject=subject,
                     body=text_message,
@@ -126,12 +129,15 @@ class RegisterView(generics.CreateAPIView):
                 )
                 email.attach_alternative(html_message, "text/html")
                 email.send(fail_silently=False)
-                print(f"Email d'activation envoyé à {user.email}")
+                print(f"SUCCESS: Email d'activation envoyé à {user.email}")
             except Exception as e:
-                print(f"Erreur lors de l'envoi de l'email d'activation: {e}")
+                print(f"ERREUR lors de l'envoi de l'email d'activation: {e}")
+                print(f"Type d'erreur: {type(e).__name__}")
                 # En cas d'erreur d'email, on peut soit lever une exception soit continuer
                 # Pour l'instant, on continue pour ne pas bloquer l'inscription
                 pass
+        else:
+            print("ERREUR: Aucun token de vérification trouvé")
 
         return user
 
