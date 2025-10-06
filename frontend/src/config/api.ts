@@ -19,6 +19,8 @@ export const API_CONFIG = {
     LOGIN: '/api/auth/login/',
     REGISTER: '/api/auth/register/',
     TOKEN_REFRESH: '/api/auth/token/refresh/',
+    ACTIVATE: '/api/auth/activate/',
+    RESEND_ACTIVATION: '/api/auth/resend-activation/',
     
     // Admin
     ADMIN_STATS: '/api/auth/admin/overview/stats/',
@@ -83,6 +85,8 @@ export const API_URLS = {
   LOGIN: buildApiUrl(API_CONFIG.ENDPOINTS.LOGIN),
   REGISTER: buildApiUrl(API_CONFIG.ENDPOINTS.REGISTER),
   TOKEN_REFRESH: buildApiUrl(API_CONFIG.ENDPOINTS.TOKEN_REFRESH),
+  ACTIVATE: buildApiUrl(API_CONFIG.ENDPOINTS.ACTIVATE),
+  RESEND_ACTIVATION: buildApiUrl(API_CONFIG.ENDPOINTS.RESEND_ACTIVATION),
   
   // Admin
   ADMIN_STATS: buildApiUrl(API_CONFIG.ENDPOINTS.ADMIN_STATS),

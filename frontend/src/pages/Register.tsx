@@ -121,11 +121,8 @@ const Register = () => {
       });
       
       if (result.success) {
-        toast({
-          title: language === 'fr' ? 'Inscription réussie' : 'Registration successful',
-          description: language === 'fr' ? 'Vérifiez votre e-mail pour activer votre compte.' : 'Check your email to activate your account.'
-        });
-        navigate('/login');
+        // Rediriger vers la page de vérification d'email avec l'email en paramètre
+        navigate(`/verify-email?email=${encodeURIComponent(formData.email)}&status=registered`);
       } else {
         toast({
           title: language === 'fr' ? "Inscription échouée" : 'Registration failed',

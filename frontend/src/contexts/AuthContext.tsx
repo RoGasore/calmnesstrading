@@ -81,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		}
 	}, []);
 
-	const login = async (email: string, password: string): Promise<boolean> => {
+	const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; errorType?: string }> => {
 		console.log('🔐 Login attempt:', { email, password: '***', apiBase: API_BASE });
 		const res = await fetch(`${API_BASE}/api/auth/login/`, {
 			method: 'POST',
@@ -92,14 +92,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		if (!res.ok) {
 			const errorData = await res.json().catch(() => ({}));
 			console.log('❌ Login error:', errorData);
-			throw new Error(errorData.detail || 'Erreur de connexion');
+			
+			// Déterminer le type d'erreur
+			let errorType = 'general';
+			if (errorData.detail && errorData.detail.includes('non vérifié')) {
+				errorType = 'unverified';
+			} else if (res.status === 401) {
+				errorType = 'credentials';
+			}
+			
+			return { 
+				success: false, 
+				error: errorData.detail || 'Erreur de connexion',
+				errorType 
+			};
 		}
 		const data = await res.json();
 		inMemoryAccessToken = data.access;
 		localStorage.setItem('refresh_token', data.refresh);
 		setUser(data.user);
 		localStorage.setItem('user_profile', JSON.stringify(data.user));
-		return true;
+		return { success: true };
 	};
 
 	const register = async (payload: { username: string; email: string; password: string; first_name?: string; last_name?: string; confirm_url?: string }): Promise<{ success: boolean; error?: string }> => {

@@ -25,6 +25,23 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = self.perform_create(serializer)
+        
+        # Retourner une réponse JSON
+        return Response({
+            'detail': 'Utilisateur créé avec succès. Vérifiez votre email pour activer votre compte.',
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name
+            }
+        }, status=status.HTTP_201_CREATED)
+
     def perform_create(self, serializer):
         user = serializer.save()
         

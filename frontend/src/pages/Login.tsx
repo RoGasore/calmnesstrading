@@ -44,19 +44,31 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const success = await login(email, password);
+      const result = await login(email, password);
       
-      if (success) {
+      if (result.success) {
         toast({
           title: "Connexion réussie",
           description: "Bienvenue !",
         });
         navigate("/");
+      } else {
+        // Gérer les différents types d'erreur
+        if (result.errorType === 'unverified') {
+          // Rediriger vers la page de vérification avec l'email
+          navigate(`/verify-email?email=${encodeURIComponent(email)}&status=unverified`);
+        } else {
+          toast({
+            title: "Erreur de connexion",
+            description: result.error || "Email ou mot de passe incorrect",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: error instanceof Error ? error.message : "Email ou mot de passe incorrect",
+        description: error instanceof Error ? error.message : "Une erreur inattendue s'est produite",
         variant: "destructive",
       });
     }
