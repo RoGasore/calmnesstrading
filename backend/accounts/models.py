@@ -5,8 +5,8 @@ from django.utils import timezone
 class User(AbstractUser):
     """Modèle utilisateur personnalisé avec champs supplémentaires"""
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    telegram_username = models.CharField(max_length=50, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    telegram_username = models.CharField(max_length=50, blank=True, null=True, unique=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

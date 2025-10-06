@@ -255,13 +255,7 @@ class AdminUserDetailView(generics.RetrieveUpdateDestroyAPIView):
             OutstandingToken.objects.filter(user=user).delete()
     
     def perform_destroy(self, instance):
-        # Supprimer les tokens de l'utilisateur
-        try:
-            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
-            OutstandingToken.objects.filter(user=instance).delete()
-        except Exception:
-            # Si la suppression des tokens échoue, continuer quand même
-            pass
+        # Supprimer l'utilisateur directement
         instance.delete()
 
 
