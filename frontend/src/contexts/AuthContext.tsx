@@ -102,13 +102,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		return true;
 	};
 
-	const register = async (payload: { username: string; email: string; password: string; first_name?: string; last_name?: string; confirm_url?: string }): Promise<boolean> => {
+	const register = async (payload: { username: string; email: string; password: string; first_name?: string; last_name?: string; confirm_url?: string }): Promise<{ success: boolean; error?: string }> => {
+		console.log('📝 Registration attempt:', { ...payload, password: '***', apiBase: API_BASE });
 		const res = await fetch(`${API_BASE}/api/auth/register/`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(payload)
 		});
-		return res.ok;
+		console.log('📡 Registration response:', res.status, res.statusText);
+		
+		if (!res.ok) {
+			const errorData = await res.json().catch(() => ({}));
+			console.log('❌ Registration error:', errorData);
+			return { success: false, error: errorData.detail || 'Erreur lors de l\'inscription' };
+		}
+		
+		return { success: true };
 	};
 
 	const logout = () => {

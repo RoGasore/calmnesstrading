@@ -103,7 +103,7 @@ const Register = () => {
     // Générer un username unique basé sur l'email
     const username = formData.email.split('@')[0] + '_' + Date.now().toString().slice(-4);
     
-    const ok = await register({
+    const result = await register({
       username: username,
       email: formData.email,
       password: formData.password,
@@ -113,7 +113,8 @@ const Register = () => {
       telegram_username: formData.telegramUsername,
       confirm_url: confirmUrl
     });
-    if (ok) {
+    
+    if (result.success) {
       toast({
         title: language === 'fr' ? 'Inscription réussie' : 'Registration successful',
         description: language === 'fr' ? 'Vérifiez votre e-mail pour activer votre compte.' : 'Check your email to activate your account.'
@@ -122,7 +123,7 @@ const Register = () => {
     } else {
       toast({
         title: language === 'fr' ? "Inscription échouée" : 'Registration failed',
-        description: language === 'fr' ? "Veuillez réessayer avec des informations valides." : 'Please try again with valid information.',
+        description: result.error || (language === 'fr' ? "Veuillez réessayer avec des informations valides." : 'Please try again with valid information.'),
         variant: 'destructive'
       });
     }

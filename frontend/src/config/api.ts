@@ -52,6 +52,7 @@ export const API_CONFIG = {
       OFFERS_PUBLIC: '/api/content/comprehensive-cms/public/offers/',
       CONTACT_FIELDS: '/api/content/comprehensive-cms/pages/contact/fields/',
       CONTACT_FIELDS_PUBLIC: '/api/content/comprehensive-cms/public/contact/fields/',
+      CONTACT_FIELDS_ADMIN_PUBLIC: '/api/content/comprehensive-cms/admin/contact/fields/',
       CLEAR_CONTACT_CACHE: '/api/content/comprehensive-cms/admin/clear-contact-cache/',
       
       // Reviews
@@ -110,6 +111,7 @@ export const API_URLS = {
   OFFERS_PUBLIC: buildApiUrl(API_CONFIG.ENDPOINTS.COMPREHENSIVE_CMS.OFFERS_PUBLIC),
   CONTACT_FIELDS: buildApiUrl(API_CONFIG.ENDPOINTS.COMPREHENSIVE_CMS.CONTACT_FIELDS),
   CONTACT_FIELDS_PUBLIC: buildApiUrl(API_CONFIG.ENDPOINTS.COMPREHENSIVE_CMS.CONTACT_FIELDS_PUBLIC),
+  CONTACT_FIELDS_ADMIN_PUBLIC: buildApiUrl(API_CONFIG.ENDPOINTS.COMPREHENSIVE_CMS.CONTACT_FIELDS_ADMIN_PUBLIC),
   CLEAR_CONTACT_CACHE: buildApiUrl(API_CONFIG.ENDPOINTS.COMPREHENSIVE_CMS.CLEAR_CONTACT_CACHE),
   
   // Reviews

@@ -108,8 +108,12 @@ class RegisterView(generics.CreateAPIView):
                     to=[user.email],
                 )
                 email.attach_alternative(html_message, "text/html")
-                email.send(fail_silently=True)
-            except Exception:
+                email.send(fail_silently=False)
+                print(f"Email d'activation envoyé à {user.email}")
+            except Exception as e:
+                print(f"Erreur lors de l'envoi de l'email d'activation: {e}")
+                # En cas d'erreur d'email, on peut soit lever une exception soit continuer
+                # Pour l'instant, on continue pour ne pas bloquer l'inscription
                 pass
 
         return user

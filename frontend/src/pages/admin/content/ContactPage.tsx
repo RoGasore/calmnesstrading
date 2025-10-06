@@ -58,7 +58,8 @@ const ContactPage: React.FC = () => {
   const loadContactData = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithAuth(API_URLS.CONTACT_FIELDS);
+      // Utiliser l'endpoint public pour éviter les problèmes d'authentification
+      const response = await fetch(API_URLS.CONTACT_FIELDS_ADMIN_PUBLIC);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
