@@ -21,6 +21,7 @@ const Register = () => {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -60,72 +61,80 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-    if (!emailPattern.test(formData.email)) {
-      toast({
-        title: language === 'fr' ? 'Email invalide' : 'Invalid email',
-        description: language === 'fr' ? "Veuillez saisir une adresse e-mail valide" : 'Please enter a valid email address',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if ((formData.password || '').length < 8) {
-      toast({
-        title: language === 'fr' ? 'Mot de passe trop court' : 'Password too short',
-        description: language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : 'Password must be at least 8 characters',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: language === 'fr' ? 'Mots de passe différents' : 'Passwords do not match',
-        description: language === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Please retype the same password',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (!formData.acceptTerms) {
-      toast({
-        title: language === 'fr' ? "Conditions d'utilisation" : 'Terms and conditions',
-        description: language === 'fr' ? 'Vous devez accepter les conditions d\'utilisation' : 'You must accept the terms and conditions',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    const confirmUrl = `${API_CONFIG.BASE_URL.replace(/\/$/, '')}/api/auth/activate/`;
+    if (isLoading) return; // Empêcher les clics multiples
     
-    // Générer un username unique basé sur l'email
-    const username = formData.email.split('@')[0] + '_' + Date.now().toString().slice(-4);
+    setIsLoading(true);
     
-    const result = await register({
-      username: username,
-      email: formData.email,
-      password: formData.password,
-      first_name: formData.name.split(' ')[0] || '',
-      last_name: formData.name.split(' ').slice(1).join(' ') || '',
-      phone: formData.phone,
-      telegram_username: formData.telegramUsername,
-      confirm_url: confirmUrl
-    });
-    
-    if (result.success) {
-      toast({
-        title: language === 'fr' ? 'Inscription réussie' : 'Registration successful',
-        description: language === 'fr' ? 'Vérifiez votre e-mail pour activer votre compte.' : 'Check your email to activate your account.'
+    try {
+      // Basic validation
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+      if (!emailPattern.test(formData.email)) {
+        toast({
+          title: language === 'fr' ? 'Email invalide' : 'Invalid email',
+          description: language === 'fr' ? "Veuillez saisir une adresse e-mail valide" : 'Please enter a valid email address',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if ((formData.password || '').length < 8) {
+        toast({
+          title: language === 'fr' ? 'Mot de passe trop court' : 'Password too short',
+          description: language === 'fr' ? 'Le mot de passe doit contenir au moins 8 caractères' : 'Password must be at least 8 characters',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: language === 'fr' ? 'Mots de passe différents' : 'Passwords do not match',
+          description: language === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Please retype the same password',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (!formData.acceptTerms) {
+        toast({
+          title: language === 'fr' ? "Conditions d'utilisation" : 'Terms and conditions',
+          description: language === 'fr' ? 'Vous devez accepter les conditions d\'utilisation' : 'You must accept the terms and conditions',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const confirmUrl = `${API_CONFIG.BASE_URL.replace(/\/$/, '')}/api/auth/activate/`;
+      
+      // Générer un username unique basé sur l'email
+      const username = formData.email.split('@')[0] + '_' + Date.now().toString().slice(-4);
+      
+      const result = await register({
+        username: username,
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.name.split(' ')[0] || '',
+        last_name: formData.name.split(' ').slice(1).join(' ') || '',
+        phone: formData.phone,
+        telegram_username: formData.telegramUsername,
+        confirm_url: confirmUrl
       });
-      navigate('/login');
-    } else {
-      toast({
-        title: language === 'fr' ? "Inscription échouée" : 'Registration failed',
-        description: result.error || (language === 'fr' ? "Veuillez réessayer avec des informations valides." : 'Please try again with valid information.'),
-        variant: 'destructive'
-      });
+      
+      if (result.success) {
+        toast({
+          title: language === 'fr' ? 'Inscription réussie' : 'Registration successful',
+          description: language === 'fr' ? 'Vérifiez votre e-mail pour activer votre compte.' : 'Check your email to activate your account.'
+        });
+        navigate('/login');
+      } else {
+        toast({
+          title: language === 'fr' ? "Inscription échouée" : 'Registration failed',
+          description: result.error || (language === 'fr' ? "Veuillez réessayer avec des informations valides." : 'Please try again with valid information.'),
+          variant: 'destructive'
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -274,9 +283,9 @@ const Register = () => {
                   type="submit" 
                   className="w-full bg-primary hover:bg-primary/90"
                   size="lg"
-                  disabled={!formData.acceptTerms}
+                  disabled={!formData.acceptTerms || isLoading}
                 >
-                  {t('register.submit')}
+                  {isLoading ? (language === 'fr' ? 'Inscription en cours...' : 'Registering...') : t('register.submit')}
                 </Button>
               </form>
 
