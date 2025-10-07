@@ -15,7 +15,8 @@ import {
   Target,
   Award,
   Activity,
-  DollarSign
+  DollarSign,
+  PlayCircle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
