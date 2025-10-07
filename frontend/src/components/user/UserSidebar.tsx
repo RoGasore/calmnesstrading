@@ -42,6 +42,7 @@ const userMenuSections = [
     items: [
       { title: "Mes Formations", url: "/user/formations", icon: GraduationCap },
       { title: "Mes Signaux", url: "/user/signaux", icon: Zap },
+      { title: "Historique Trading", url: "/user/trading-history", icon: TrendingUp },
       { title: "Gestion de Compte", url: "/user/gestion", icon: Target },
     ]
   },
