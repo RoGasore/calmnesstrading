@@ -25,7 +25,9 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotifications } from "@/hooks/use-notifications";
 
 const userMenuSections = [
   {
@@ -62,6 +64,7 @@ const userMenuSections = [
 export function UserSidebar() {
   const { state } = useSidebar();
   const { logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
@@ -103,8 +106,19 @@ export function UserSidebar() {
                         end={item.exact}
                         className={({ isActive }) => getNavCls({ isActive })}
                       >
-                        <item.icon className="h-4 w-4" />
-                        {!collapsed && <span>{item.title}</span>}
+                        <div className="flex items-center gap-2 flex-1">
+                          <item.icon className="h-4 w-4" />
+                          {!collapsed && <span>{item.title}</span>}
+                          {/* Badge de notification pour la page Notifications */}
+                          {!collapsed && item.url === '/user/notifications' && unreadCount > 0 && (
+                            <Badge 
+                              variant="destructive" 
+                              className="ml-auto h-5 min-w-[20px] flex items-center justify-center text-xs px-1.5"
+                            >
+                              {unreadCount > 99 ? '99+' : unreadCount}
+                            </Badge>
+                          )}
+                        </div>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

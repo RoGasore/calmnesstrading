@@ -5,6 +5,7 @@ import { UserProfile } from "./user/UserProfile";
 import { UserFormations } from "./user/UserFormations";
 import { UserSignaux } from "./user/UserSignaux";
 import { UserPayments } from "./user/UserPayments";
+import { UserNotifications } from "./user/UserNotifications";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -37,9 +38,9 @@ export default function User() {
         <Route path="formations" element={<UserFormations />} />
         <Route path="signaux" element={<UserSignaux />} />
         <Route path="payments" element={<UserPayments />} />
+        <Route path="notifications" element={<UserNotifications />} />
         <Route path="gestion" element={<UserDashboard />} /> {/* TODO: Créer la page UserGestion */}
         <Route path="wallet" element={<UserDashboard />} /> {/* TODO: Créer la page UserWallet */}
-        <Route path="notifications" element={<UserDashboard />} /> {/* TODO: Créer la page UserNotifications */}
         <Route path="settings" element={<UserDashboard />} /> {/* TODO: Créer la page UserSettings */}
         <Route path="*" element={<Navigate to="/user" replace />} />
       </Routes>
