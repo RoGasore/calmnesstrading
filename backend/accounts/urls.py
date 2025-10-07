@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     RegisterView, MeView, activate_email, resend_activation_email, login_with_email,
@@ -17,6 +17,9 @@ urlpatterns = [
     # Activation d'email
     path('activate/', activate_email, name='activate_email'),
     path('resend-activation/', resend_activation_email, name='resend_activation_email'),
+    
+    # Espace utilisateur
+    path('user/', include('accounts.urls_user')),
     
     # Gestion admin
     path('admin/users/', AdminUserListView.as_view(), name='admin_user_list'),
