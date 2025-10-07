@@ -2,12 +2,18 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export interface User {
 	id: number;
-  avatar: string;
+  avatar?: string;
 	email: string;
 	username: string;
 	first_name?: string;
 	last_name?: string;
 	is_staff?: boolean;
+	phone?: string;
+	telegram_username?: string;
+	is_verified?: boolean;
+	is_active?: boolean;
+	created_at?: string;
+	last_login?: string;
 }
 
 interface AuthContextType {
