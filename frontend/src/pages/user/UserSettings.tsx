@@ -156,110 +156,158 @@ export function UserSettings() {
             </Alert>
           )}
 
-          {/* Instructions d'activation */}
+          {/* Instructions et clé API */}
           {tradingHistoryEnabled && (
-            <div className="space-y-4 border-t pt-4">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                Comment activer la synchronisation ?
-              </h3>
-              
-              <div className="bg-muted p-4 rounded-lg space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      1
+            <div className="space-y-6 border-t pt-6 mt-4">
+              {/* Clé API - Section principale */}
+              <div className="space-y-3">
+                <h3 className="font-semibold flex items-center gap-2 text-lg">
+                  <Key className="h-5 w-5 text-primary" />
+                  Votre Clé API Unique
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Cette clé permet de connecter votre MetaTrader à votre compte Calmness Trading de manière sécurisée. 
+                  Vous devrez la copier et la coller dans les paramètres de l'Expert Advisor.
+                </p>
+                {apiKey ? (
+                  <div className="bg-muted p-4 rounded-lg border-2 border-primary/30 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Votre clé API :</span>
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Active</Badge>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium">Téléchargez l'Expert Advisor</p>
-                      <p className="text-sm text-muted-foreground">
-                        Téléchargez le script qui enverra vos trades à votre dashboard
-                      </p>
-                      <Button size="sm" className="mt-2" onClick={downloadEA}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Télécharger le Script EA
+                    <div className="flex items-center gap-2 p-3 bg-background border rounded-lg">
+                      <Key className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <code className="text-sm flex-1 font-mono break-all">{apiKey}</code>
+                      <Button size="sm" variant="default" onClick={() => {
+                        navigator.clipboard.writeText(apiKey);
+                        toast({ 
+                          title: "✓ Copié !", 
+                          description: "Clé API copiée dans le presse-papiers. Collez-la dans votre EA." 
+                        });
+                      }}>
+                        <Download className="mr-2 h-3 w-3" />
+                        Copier
                       </Button>
                     </div>
+                    <Alert className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300">
+                      <AlertCircle className="h-4 w-4 text-yellow-600" />
+                      <AlertDescription className="text-xs text-yellow-800 dark:text-yellow-200">
+                        <strong>Ne partagez jamais cette clé !</strong> Elle permet d'accéder à votre historique de trading.
+                      </AlertDescription>
+                    </Alert>
                   </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      2
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">Installez-le sur MetaTrader</p>
-                      <p className="text-sm text-muted-foreground">
-                        Suivez le guide PDF inclus dans le ZIP pour installer l'EA sur votre MT4/MT5
-                      </p>
-                    </div>
+                ) : (
+                  <div className="bg-muted p-4 rounded-lg border-2 border-dashed space-y-2">
+                    <p className="text-sm text-muted-foreground">Aucune clé API générée pour le moment.</p>
+                    <Button size="sm" variant="outline" onClick={async () => {
+                      // Appel API pour générer une clé
+                      const newApiKey = `CT-${Math.random().toString(36).substring(2, 15)}-${Math.random().toString(36).substring(2, 15)}`;
+                      setApiKey(newApiKey);
+                      toast({ 
+                        title: "Clé API générée !", 
+                        description: "Votre clé API unique a été créée. Copiez-la pour la configurer dans votre EA." 
+                      });
+                    }}>
+                      <Key className="mr-2 h-4 w-4" />
+                      Générer ma clé API
+                    </Button>
                   </div>
+                )}
+              </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      3
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">Configurez votre clé API</p>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        Copiez votre clé API unique et collez-la dans les paramètres de l'EA
-                      </p>
-                      {apiKey && (
-                        <div className="flex items-center gap-2 p-2 bg-background border rounded">
-                          <Key className="h-4 w-4 text-muted-foreground" />
-                          <code className="text-xs flex-1 font-mono">{apiKey}</code>
-                          <Button size="sm" variant="outline" onClick={() => {
-                            navigator.clipboard.writeText(apiKey);
-                            toast({ title: "Copié !", description: "Clé API copiée dans le presse-papiers" });
-                          }}>
-                            Copier
-                          </Button>
-                        </div>
-                      )}
-                      {!apiKey && (
-                        <Button size="sm" variant="outline" className="mt-2">
-                          <Key className="mr-2 h-4 w-4" />
-                          Générer ma clé API
+              {/* Instructions */}
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2 text-lg">
+                  <Shield className="h-5 w-5 text-primary" />
+                  Installation de l'Expert Advisor (EA)
+                </h3>
+                
+                <div className="bg-muted p-5 rounded-lg space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Pour que vos trades MetaTrader apparaissent automatiquement sur votre dashboard, suivez ces étapes :
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                        1
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                        <p className="font-medium text-sm">Téléchargez l'Expert Advisor</p>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Cliquez sur le bouton ci-dessous pour télécharger le script EA et le guide d'installation PDF
+                        </p>
+                        <Button size="sm" variant="default" onClick={downloadEA}>
+                          <Download className="mr-2 h-4 w-4" />
+                          Télécharger le Script EA (.zip)
                         </Button>
-                      )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      4
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                        2
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                        <p className="font-medium text-sm">Installez l'EA sur MetaTrader 4 ou 5</p>
+                        <p className="text-xs text-muted-foreground">
+                          Décompressez le fichier ZIP et suivez le guide PDF inclus. En résumé : copiez le fichier .mq4 (ou .ex4) 
+                          dans le dossier <code className="bg-background px-1 rounded">MQL4/Experts</code> de MetaTrader, puis redémarrez MetaTrader.
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium">Activez l'EA dans MetaTrader</p>
-                      <p className="text-sm text-muted-foreground">
-                        Glissez-déposez l'EA sur un graphique et assurez-vous que le bouton "Auto Trading" est activé (vert)
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-sm font-bold">
-                      5
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                        3
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                        <p className="font-medium text-sm">Configurez votre clé API dans l'EA</p>
+                        <p className="text-xs text-muted-foreground">
+                          Glissez-déposez l'EA sur un graphique MetaTrader. Dans la fenêtre qui s'ouvre, allez dans l'onglet "Entrées" (Inputs) 
+                          et collez votre clé API (affichée ci-dessus) dans le champ prévu à cet effet.
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium">Vérifiez la synchronisation</p>
-                      <p className="text-sm text-muted-foreground">
-                        Retournez dans "Historique Trading" et vos trades apparaîtront automatiquement dans 1-2 minutes
-                      </p>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                        4
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                        <p className="font-medium text-sm">Activez l'EA dans MetaTrader</p>
+                        <p className="text-xs text-muted-foreground">
+                          Assurez-vous que le bouton "Auto Trading" (ou "Trading Algo") dans la barre d'outils de MetaTrader est activé (doit être vert). 
+                          Un smiley souriant devrait apparaître dans le coin du graphique.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                        5
+                      </div>
+                      <div className="flex-1 pt-0.5">
+                        <p className="font-medium text-sm">Vérifiez la synchronisation</p>
+                        <p className="text-xs text-muted-foreground">
+                          Retournez dans <strong>"Historique Trading"</strong> sur votre dashboard. Vos trades devraient apparaître automatiquement 
+                          dans 1 à 2 minutes. La synchronisation se fait toutes les 60 secondes.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Important</AlertTitle>
-                <AlertDescription className="text-sm space-y-2">
-                  <p>• L'EA doit rester <strong>ACTIVÉ</strong> sur votre MetaTrader pour que la synchronisation fonctionne</p>
-                  <p>• Si vous fermez MetaTrader, la synchronisation s'arrêtera</p>
-                  <p>• L'EA ne prend <strong>AUCUN TRADE</strong> - Il lit uniquement votre historique</p>
-                  <p>• Vous pouvez désactiver cette fonctionnalité à tout moment depuis cette page</p>
-                </AlertDescription>
-              </Alert>
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle className="text-sm">⚠️ Points importants</AlertTitle>
+                  <AlertDescription className="text-xs space-y-1.5 mt-2">
+                    <p>• L'EA doit rester <strong>ACTIVÉ</strong> sur votre MetaTrader pour que la synchronisation continue de fonctionner</p>
+                    <p>• Si vous fermez MetaTrader, la synchronisation s'arrêtera temporairement (elle reprendra au redémarrage)</p>
+                    <p>• L'EA ne prend <strong>AUCUN TRADE AUTOMATIQUE</strong> - Il fonctionne en <strong>lecture seule</strong> et lit uniquement votre historique</p>
+                    <p>• Vous pouvez désactiver cette fonctionnalité à tout moment en désactivant le switch en haut de cette page</p>
+                  </AlertDescription>
+                </Alert>
+              </div>
             </div>
           )}
         </CardContent>

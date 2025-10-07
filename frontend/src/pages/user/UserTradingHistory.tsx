@@ -178,32 +178,44 @@ export function UserTradingHistory() {
             </Alert>
 
             <div className="bg-muted/50 p-4 sm:p-6 rounded-lg space-y-4">
-              <h3 className="font-semibold flex items-center gap-2">
+              <h3 className="font-semibold flex items-center gap-2 text-lg">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
                 Qu'est-ce que l'historique de trading ?
               </h3>
-              <ul className="text-sm space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span><strong>Synchronisation automatique</strong> de vos trades depuis MetaTrader 4/5</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span><strong>Statistiques détaillées</strong> : Win Rate, Profit Factor, Profit/Perte</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span><strong>Filtres avancés</strong> : Par période, statut, résultat, symbole</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span><strong>Export Excel</strong> pour analyse approfondie</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-0.5">•</span>
-                  <span><strong>Accessible partout</strong> : Web, mobile, tablette</span>
-                </li>
-              </ul>
+              <p className="text-sm text-muted-foreground">
+                L'historique de trading vous permet de <strong>synchroniser automatiquement tous vos trades</strong> depuis votre plateforme 
+                MetaTrader 4 ou MetaTrader 5 vers votre tableau de bord Calmness Trading. Vous pourrez ainsi analyser vos performances, 
+                suivre vos statistiques et améliorer votre stratégie de trading.
+              </p>
+              <div className="border-t pt-4 space-y-3">
+                <h4 className="font-medium text-sm">✨ Fonctionnalités incluses :</h4>
+                <ul className="text-sm space-y-2.5">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span><strong>Synchronisation en temps réel</strong> - Vos trades apparaissent automatiquement sur votre dashboard toutes les 60 secondes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span><strong>Statistiques avancées</strong> - Win Rate, Profit Factor, Drawdown, Profit/Perte total, nombre de trades gagnants/perdants</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span><strong>Filtres puissants</strong> - Filtrez vos trades par période (jour, semaine, mois, personnalisé), statut (ouvert/fermé), résultat (gagnant/perdant), symbole</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span><strong>Export Excel</strong> - Téléchargez votre historique complet au format Excel pour une analyse approfondie hors ligne</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span><strong>Accessible partout</strong> - Consultez votre historique depuis n'importe quel appareil : ordinateur, tablette ou smartphone</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary mt-0.5">•</span>
+                    <span><strong>Graphiques visuels</strong> - Visualisez vos performances avec des graphiques interactifs et des courbes d'évolution</span>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
