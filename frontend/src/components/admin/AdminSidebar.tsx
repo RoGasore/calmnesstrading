@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { 
   Home, 
   Users, 
@@ -12,8 +12,10 @@ import {
   BookOpen,
   CreditCard,
   ShoppingBag,
-  Zap
+  Zap,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sidebar,
   SidebarContent,
@@ -62,6 +64,8 @@ const adminMenuSections = [
 
 export function AdminSidebar() {
   const { state } = useSidebar();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
@@ -71,6 +75,11 @@ export function AdminSidebar() {
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-primary/10 text-primary font-medium border-r-2 border-primary" : "hover:bg-muted/50";
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <Sidebar
@@ -107,6 +116,20 @@ export function AdminSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
+
+        {/* Déconnexion */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={handleLogout} className="hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20">
+                  <LogOut className="h-4 w-4" />
+                  {!collapsed && <span>Déconnexion</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
