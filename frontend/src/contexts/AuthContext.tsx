@@ -34,17 +34,48 @@ const API_BASE = API_CONFIG.BASE_URL;
 
 let inMemoryAccessToken: string | null = null;
 
+// Fonction pour sauvegarder le token d'accès
+function saveAccessToken(token: string) {
+	inMemoryAccessToken = token;
+	localStorage.setItem('access_token', token);
+}
+
+// Fonction pour récupérer le token d'accès
+function getAccessToken(): string | null {
+	if (inMemoryAccessToken) {
+		return inMemoryAccessToken;
+	}
+	const saved = localStorage.getItem('access_token');
+	if (saved) {
+		inMemoryAccessToken = saved;
+		return saved;
+	}
+	return null;
+}
+
+// Fonction pour supprimer les tokens
+function clearTokens() {
+	inMemoryAccessToken = null;
+	localStorage.removeItem('access_token');
+	localStorage.removeItem('refresh_token');
+	localStorage.removeItem('user_profile');
+}
+
 async function fetchWithAuth(input: RequestInfo, init?: RequestInit): Promise<Response> {
 	const headers = new Headers(init?.headers || {});
-	if (inMemoryAccessToken) {
-		headers.set('Authorization', `Bearer ${inMemoryAccessToken}`);
+	const token = getAccessToken();
+	if (token) {
+		headers.set('Authorization', `Bearer ${token}`);
 	}
 	const response = await fetch(input, { ...(init || {}), headers });
 	if (response.status === 401) {
 		const refreshed = await tryRefreshToken();
-		if (refreshed && inMemoryAccessToken) {
-			headers.set('Authorization', `Bearer ${inMemoryAccessToken}`);
-			return fetch(input, { ...(init || {}), headers });
+		if (refreshed) {
+			const newToken = getAccessToken();
+			if (newToken) {
+				headers.set('Authorization', `Bearer ${newToken}`);
+				return fetch(input, { ...(init || {}), headers });
+			}
 		}
 	}
 	return response;
@@ -59,12 +90,11 @@ async function tryRefreshToken(): Promise<boolean> {
 		body: JSON.stringify({ refresh })
 	});
 	if (!res.ok) {
-		localStorage.removeItem('refresh_token');
-		inMemoryAccessToken = null;
+		clearTokens();
 		return false;
 	}
 	const data = await res.json();
-	inMemoryAccessToken = data.access;
+	saveAccessToken(data.access);
 	return true;
 }
 
@@ -74,15 +104,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	useEffect(() => {
 		const savedUser = localStorage.getItem('user_profile');
 		const savedRefreshToken = localStorage.getItem('refresh_token');
+		const savedAccessToken = localStorage.getItem('access_token');
 		
 		if (savedUser && savedRefreshToken) {
 			try { 
 				setUser(JSON.parse(savedUser)); 
-				// Essayer de restaurer le token d'accès
-				tryRefreshToken();
+				// Restaurer le token d'accès s'il existe
+				if (savedAccessToken) {
+					inMemoryAccessToken = savedAccessToken;
+				} else {
+					// Sinon essayer de le rafraîchir
+					tryRefreshToken();
+				}
 			} catch { 
-				localStorage.removeItem('user_profile');
-				localStorage.removeItem('refresh_token');
+				clearTokens();
 			}
 		}
 	}, []);
@@ -114,7 +149,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			};
 		}
 		const data = await res.json();
-		inMemoryAccessToken = data.access;
+		saveAccessToken(data.access);
 		localStorage.setItem('refresh_token', data.refresh);
 		setUser(data.user);
 		localStorage.setItem('user_profile', JSON.stringify(data.user));
@@ -140,9 +175,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	};
 
 	const logout = () => {
-		inMemoryAccessToken = null;
-		localStorage.removeItem('refresh_token');
-		localStorage.removeItem('user_profile');
+		clearTokens();
 		setUser(null);
 	};
 
