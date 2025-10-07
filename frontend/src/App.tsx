@@ -17,6 +17,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
+import User from "./pages/User";
 import Formation from "./pages/Formation";
 import CourseContent from "./pages/CourseContent";
 import Signaux from "./pages/Signaux";
@@ -62,6 +63,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/admin/*" element={<Admin />} />
+              <Route path="/user/*" element={<User />} />
           {/* Services Routes */}
           <Route path="/services" element={<Services />} />
           <Route path="/services/formations" element={<ServicesFormations />} />
