@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'payments'
@@ -43,5 +43,8 @@ urlpatterns = [
     # ==================== GESTION DES OFFRES (ADMIN) ====================
     path('admin/offers/', views.AdminOfferListCreateView.as_view(), name='admin_offers'),
     path('admin/offers/<int:pk>/', views.AdminOfferDetailView.as_view(), name='admin_offer_detail'),
+    
+    # ==================== FACTURES ====================
+    path('', include('payments.urls_invoice')),
 ]
 

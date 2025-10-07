@@ -43,3 +43,4 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Contact fields recreation completed!'))
 
 
+
