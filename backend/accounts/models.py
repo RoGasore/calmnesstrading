@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+import uuid
 
 class User(AbstractUser):
     """Modèle utilisateur personnalisé avec champs supplémentaires"""
@@ -393,5 +394,205 @@ class FormationSession(models.Model):
     def is_past(self):
         """Vérifie si la session est passée"""
         return self.scheduled_date < timezone.now()
+
+
+class TradingAccount(models.Model):
+    """Compte de trading MetaTrader de l'utilisateur"""
+    
+    PLATFORM_CHOICES = [
+        ('mt4', 'MetaTrader 4'),
+        ('mt5', 'MetaTrader 5'),
+    ]
+    
+    ACCOUNT_TYPE_CHOICES = [
+        ('demo', 'Compte Démo'),
+        ('real', 'Compte Réel'),
+    ]
+    
+    # Relations
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='trading_accounts')
+    
+    # Identifiant unique pour l'API
+    api_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    
+    # Informations du compte
+    account_number = models.CharField(max_length=50, verbose_name="Numéro de compte")
+    platform = models.CharField(max_length=10, choices=PLATFORM_CHOICES, verbose_name="Plateforme")
+    account_type = models.CharField(max_length=10, choices=ACCOUNT_TYPE_CHOICES, verbose_name="Type de compte")
+    broker_name = models.CharField(max_length=100, verbose_name="Nom du broker")
+    
+    # Informations de connexion
+    account_name = models.CharField(max_length=100, verbose_name="Nom du compte")
+    currency = models.CharField(max_length=3, default='USD', verbose_name="Devise")
+    leverage = models.IntegerField(default=100, verbose_name="Effet de levier")
+    
+    # État du compte
+    is_active = models.BooleanField(default=True, verbose_name="Actif")
+    balance = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Solde")
+    equity = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Équité")
+    margin = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Marge")
+    free_margin = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Marge libre")
+    
+    # Synchronisation
+    last_sync_at = models.DateTimeField(null=True, blank=True, verbose_name="Dernière synchro")
+    ea_installed = models.BooleanField(default=False, verbose_name="EA installé")
+    ea_version = models.CharField(max_length=20, blank=True, verbose_name="Version EA")
+    
+    # Métadonnées
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Compte de Trading"
+        verbose_name_plural = "Comptes de Trading"
+        ordering = ['-created_at']
+        unique_together = ['user', 'account_number', 'broker_name']
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.account_number} ({self.broker_name})"
+    
+    def regenerate_api_key(self):
+        """Régénérer l'API key pour la sécurité"""
+        self.api_key = uuid.uuid4()
+        self.save(update_fields=['api_key'])
+        return self.api_key
+
+
+class Trade(models.Model):
+    """Trade individuel depuis MetaTrader"""
+    
+    TRADE_TYPE_CHOICES = [
+        ('buy', 'BUY'),
+        ('sell', 'SELL'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('open', 'Ouvert'),
+        ('closed', 'Fermé'),
+        ('cancelled', 'Annulé'),
+    ]
+    
+    # Relations
+    trading_account = models.ForeignKey(TradingAccount, on_delete=models.CASCADE, related_name='trades')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='trades')
+    
+    # Identifiants
+    ticket = models.CharField(max_length=50, verbose_name="Ticket MT")
+    magic_number = models.IntegerField(null=True, blank=True, verbose_name="Magic Number")
+    
+    # Informations du trade
+    symbol = models.CharField(max_length=20, verbose_name="Symbole")
+    trade_type = models.CharField(max_length=10, choices=TRADE_TYPE_CHOICES, verbose_name="Type")
+    volume = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Volume (lots)")
+    
+    # Prix
+    open_price = models.DecimalField(max_digits=15, decimal_places=5, verbose_name="Prix d'ouverture")
+    close_price = models.DecimalField(max_digits=15, decimal_places=5, null=True, blank=True, verbose_name="Prix de clôture")
+    stop_loss = models.DecimalField(max_digits=15, decimal_places=5, null=True, blank=True, verbose_name="Stop Loss")
+    take_profit = models.DecimalField(max_digits=15, decimal_places=5, null=True, blank=True, verbose_name="Take Profit")
+    current_price = models.DecimalField(max_digits=15, decimal_places=5, null=True, blank=True, verbose_name="Prix actuel")
+    
+    # Résultats
+    profit = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Profit/Perte")
+    swap = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Swap")
+    commission = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Commission")
+    
+    # Dates et heures
+    open_time = models.DateTimeField(verbose_name="Heure d'ouverture")
+    close_time = models.DateTimeField(null=True, blank=True, verbose_name="Heure de clôture")
+    
+    # Statut
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    
+    # Commentaire et tags
+    comment = models.TextField(blank=True, verbose_name="Commentaire")
+    user_notes = models.TextField(blank=True, verbose_name="Notes personnelles")
+    tags = models.JSONField(default=list, blank=True, verbose_name="Tags")
+    
+    # Métadonnées
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Trade"
+        verbose_name_plural = "Trades"
+        ordering = ['-open_time']
+        unique_together = ['trading_account', 'ticket']
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['open_time']),
+            models.Index(fields=['symbol']),
+        ]
+    
+    def __str__(self):
+        return f"{self.ticket} - {self.symbol} {self.trade_type} - {self.profit}"
+    
+    def duration(self):
+        """Calcule la durée du trade"""
+        if not self.close_time:
+            return timezone.now() - self.open_time
+        return self.close_time - self.open_time
+    
+    def duration_minutes(self):
+        """Durée en minutes"""
+        return int(self.duration().total_seconds() / 60)
+    
+    def is_profitable(self):
+        """Vérifie si le trade est profitable"""
+        return self.profit > 0
+    
+    def total_cost(self):
+        """Coût total (profit - swap - commission)"""
+        return float(self.profit) + float(self.swap) + float(self.commission)
+
+
+class TradingStatistics(models.Model):
+    """Statistiques de trading calculées périodiquement"""
+    
+    PERIOD_CHOICES = [
+        ('daily', 'Quotidien'),
+        ('weekly', 'Hebdomadaire'),
+        ('monthly', 'Mensuel'),
+        ('yearly', 'Annuel'),
+        ('all_time', 'Tout le temps'),
+    ]
+    
+    # Relations
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='trading_stats')
+    trading_account = models.ForeignKey(TradingAccount, on_delete=models.CASCADE, related_name='statistics', null=True, blank=True)
+    
+    # Période
+    period_type = models.CharField(max_length=20, choices=PERIOD_CHOICES)
+    period_start = models.DateField(verbose_name="Début de période")
+    period_end = models.DateField(verbose_name="Fin de période")
+    
+    # Statistiques de base
+    total_trades = models.IntegerField(default=0, verbose_name="Total trades")
+    winning_trades = models.IntegerField(default=0, verbose_name="Trades gagnants")
+    losing_trades = models.IntegerField(default=0, verbose_name="Trades perdants")
+    
+    # Performance
+    total_profit = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Profit total")
+    total_loss = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Perte totale")
+    net_profit = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Profit net")
+    
+    # Ratios
+    win_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0, verbose_name="Win rate (%)")
+    profit_factor = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Profit factor")
+    average_win = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Gain moyen")
+    average_loss = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Perte moyenne")
+    
+    # Métadonnées
+    calculated_at = models.DateTimeField(auto_now_add=True, verbose_name="Calculé le")
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Statistiques de Trading"
+        verbose_name_plural = "Statistiques de Trading"
+        ordering = ['-period_start']
+        unique_together = ['user', 'trading_account', 'period_type', 'period_start']
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.period_type} ({self.period_start})"
 
 
