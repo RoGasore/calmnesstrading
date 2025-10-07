@@ -27,10 +27,13 @@ class Command(BaseCommand):
             last_name='Dupont',
             phone='+33612345678',
             telegram_username='@jeandupont',
+            discord_username='jeandupont#1234',
+            whatsapp_number='+33612345678',
             is_staff=False,
             is_superuser=False,
             is_active=True,
-            is_verified=True
+            is_verified=True,
+            can_make_payment=True  # Profil complet
         )
         
         # Créer le profil utilisateur avec des préférences
@@ -53,7 +56,10 @@ class Command(BaseCommand):
                 f'🔑 Mot de passe: {test_password}\n'
                 f'👤 Nom: {test_user.first_name} {test_user.last_name}\n'
                 f'📱 Téléphone: {test_user.phone}\n'
-                f'💬 Telegram: {test_user.telegram_username}'
+                f'💬 Telegram: {test_user.telegram_username}\n'
+                f'🎮 Discord: {test_user.discord_username}\n'
+                f'📲 WhatsApp: {test_user.whatsapp_number}\n'
+                f'✓ Profil complet - Peut effectuer des paiements'
             )
         )
 
