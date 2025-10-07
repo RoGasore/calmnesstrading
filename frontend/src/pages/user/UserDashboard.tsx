@@ -20,6 +20,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { WidgetContainer, WidgetSettings } from "@/components/user/widgets";
 
 export function UserDashboard() {
   const { user, fetchWithAuth } = useAuth();
@@ -42,13 +43,23 @@ export function UserDashboard() {
         stats: {
           formations_actives: 2,
           formations_completees: 1,
-          signaux_actifs: 1,
-          paiements_total: 548.00
+          signaux_actifs: 3,
+          paiements_total: 548.00,
+          total_spent: 548.00,
+          profit_total: 250,
+          win_rate: 75
         },
+        active_subscriptions: [
+          { id: 1, service: 'Signaux Mensuels', days_remaining: 15, hours_remaining: 360 }
+        ],
         recent_activity: [
           { type: 'formation', title: 'Formation Basic complétée', date: '2024-01-15', status: 'completed' },
           { type: 'signal', title: 'Nouveau signal EUR/USD', date: '2024-01-14', status: 'new' },
           { type: 'payment', title: 'Paiement Formation Advanced', date: '2024-01-13', status: 'completed' }
+        ],
+        recent_payments: [
+          { id: 1, paid_at: '2024-01-15', amount: 349.00 },
+          { id: 2, paid_at: '2024-01-01', amount: 99.00 }
         ],
         formations: [
           { id: 1, name: 'Formation Basic', progress: 100, status: 'completed' },
@@ -111,6 +122,10 @@ export function UserDashboard() {
     }
   ];
 
+  const handleWidgetReset = () => {
+    // Le reset sera géré par WidgetContainer lui-même via le reload
+  };
+
   return (
     <div className="space-y-6">
       {/* En-tête avec message de bienvenue */}
@@ -128,33 +143,8 @@ export function UserDashboard() {
         </div>
       </div>
 
-      {/* Statistiques principales */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card 
-            key={index}
-            className="hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => navigate(stat.link)}
-          >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <div className={`${stat.bgColor} p-2 rounded-lg`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <Button variant="ghost" size="sm" className="mt-2 p-0 h-auto hover:bg-transparent">
-                <span className="text-xs text-primary flex items-center gap-1">
-                  Voir plus <ArrowRight className="h-3 w-3" />
-                </span>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Widgets personnalisables */}
+      <WidgetContainer dashboardData={dashboardData} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Progression des formations */}
@@ -235,6 +225,9 @@ export function UserDashboard() {
 
         {/* Colonne de droite */}
         <div className="space-y-6">
+          {/* Paramètres des widgets */}
+          <WidgetSettings onReset={handleWidgetReset} />
+          
           {/* Prochain paiement */}
           <Card>
             <CardHeader>
