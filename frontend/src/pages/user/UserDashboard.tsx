@@ -62,9 +62,8 @@ export function UserDashboard() {
           { id: 2, paid_at: '2024-01-01', amount: 99.00 }
         ],
         formations: [
-          { id: 1, name: 'Formation Basic', progress: 100, status: 'completed' },
-          { id: 2, name: 'Formation Advanced', progress: 45, status: 'in_progress' },
-          { id: 3, name: 'Formation Elite', progress: 0, status: 'not_started' }
+          { id: 1, name: 'Formation Initiation', status: 'completed', endDate: '2024-01-15' },
+          { id: 2, name: 'Formation Basic', status: 'active', endDate: '2024-02-15', nextSession: '2024-01-22 19:00' }
         ],
         next_payment: {
           service: 'Signaux Mensuels',
@@ -153,28 +152,43 @@ export function UserDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5" />
-                Mes Formations en Cours
+                Mes Formations
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {dashboardData?.formations
-                .filter((f: any) => f.status !== 'not_started')
-                .map((formation: any) => (
-                  <div key={formation.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{formation.name}</span>
-                        {formation.status === 'completed' && (
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        )}
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        {formation.progress}%
-                      </span>
-                    </div>
-                    <Progress value={formation.progress} className="h-2" />
+              {dashboardData?.formations.map((formation: any) => (
+                <div key={formation.id} className="flex items-start gap-3 p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className={`p-2 rounded-lg ${
+                    formation.status === 'active' ? 'bg-blue-50 dark:bg-blue-900/20' :
+                    'bg-green-50 dark:bg-green-900/20'
+                  }`}>
+                    {formation.status === 'active' ? (
+                      <PlayCircle className="h-4 w-4 text-blue-600" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    )}
                   </div>
-                ))}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-sm">{formation.name}</span>
+                      <Badge 
+                        variant={formation.status === 'active' ? 'default' : 'secondary'}
+                        className={formation.status === 'active' ? 'bg-blue-500' : 'bg-green-500'}
+                      >
+                        {formation.status === 'active' ? 'En cours' : 'Terminée'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {formation.status === 'active' && formation.nextSession && (
+                        <>Prochaine session : {new Date(formation.nextSession).toLocaleDateString('fr-FR')}</>
+                      )}
+                      {formation.status === 'completed' && (
+                        <>Terminée le {new Date(formation.endDate).toLocaleDateString('fr-FR')}</>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ))}
               
               <Button 
                 onClick={() => navigate('/user/formations')} 

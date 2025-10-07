@@ -58,11 +58,11 @@ const WIDGET_TYPES = {
     color: 'text-green-600',
     description: 'Formations complétées'
   },
-  'formations_progress': {
-    title: 'Progression Globale',
-    icon: TrendingUp,
-    color: 'text-purple-600',
-    description: 'Votre progression totale'
+  'formations_upcoming': {
+    title: 'Formations À Venir',
+    icon: Clock,
+    color: 'text-orange-600',
+    description: 'Formations planifiées'
   },
   
   // Widgets signaux
@@ -179,14 +179,11 @@ export function WidgetContainer({ className = "", dashboardData }: WidgetContain
           value: dashboardData.stats?.formations_completees || 0,
           change: 'terminées'
         };
-      case 'formations_progress':
-        const active = dashboardData.stats?.formations_actives || 0;
-        const completed = dashboardData.stats?.formations_completees || 0;
-        const total = active + completed;
-        const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+      case 'formations_upcoming':
+        const upcomingCount = dashboardData.formations?.filter((f: any) => f.status === 'upcoming')?.length || 0;
         return { 
-          value: `${progress}%`,
-          change: 'de progression'
+          value: upcomingCount,
+          change: 'à venir'
         };
       case 'signaux_active':
         return { 
