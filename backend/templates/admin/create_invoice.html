@@ -1,0 +1,154 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Créer une Facture{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-invoice"></i>
+                        Créer une Facture
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="createInvoiceForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="customer_id">Client *</label>
+                                    <select class="form-control" id="customer_id" name="customer_id" required>
+                                        <option value="">Sélectionner un client</option>
+                                        {% for payment in unpaid_payments %}
+                                            <option value="{{ payment.user.id }}" data-payment-id="{{ payment.id }}">
+                                                {{ payment.user.get_full_name }} ({{ payment.user.email }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="payment_id">Paiement à Facturer *</label>
+                                    <select class="form-control" id="payment_id" name="payment_id" required>
+                                        <option value="">Sélectionner un paiement</option>
+                                        {% for payment in unpaid_payments %}
+                                            <option value="{{ payment.id }}" data-customer-id="{{ payment.user.id }}">
+                                                {{ payment.service_name }} - {{ payment.amount }}€ ({{ payment.paid_at|date:"d/m/Y" }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="transaction_reference">Numéro de Transaction *</label>
+                                    <input type="text" class="form-control" id="transaction_reference" 
+                                           name="transaction_reference" required
+                                           placeholder="Ex: TXN123456789">
+                                    <small class="form-text text-muted">
+                                        Numéro de transaction fourni par le client (obligatoire pour validation)
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Informations du Paiement</label>
+                                    <div id="payment-info" class="alert alert-info" style="display: none;">
+                                        <strong>Service:</strong> <span id="service-name"></span><br>
+                                        <strong>Montant:</strong> <span id="amount"></span>€<br>
+                                        <strong>Date:</strong> <span id="payment-date"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="notes">Notes Additionnelles</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3"
+                                              placeholder="Notes optionnelles pour la facture..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-invoice"></i>
+                                Créer la Facture
+                            </button>
+                            <a href="{% url 'admin_invoices_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Retour à la Liste
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const customerSelect = document.getElementById('customer_id');
+    const paymentSelect = document.getElementById('payment_id');
+    const paymentInfo = document.getElementById('payment-info');
+    
+    // Synchroniser les sélections
+    customerSelect.addEventListener('change', function() {
+        const customerId = this.value;
+        paymentSelect.innerHTML = '<option value="">Sélectionner un paiement</option>';
+        
+        {% for payment in unpaid_payments %}
+            if ({{ payment.user.id }} == customerId) {
+                const option = document.createElement('option');
+                option.value = '{{ payment.id }}';
+                option.textContent = '{{ payment.service_name }} - {{ payment.amount }}€ ({{ payment.paid_at|date:"d/m/Y" }})';
+                option.dataset.customerId = '{{ payment.user.id }}';
+                paymentSelect.appendChild(option);
+            }
+        {% endfor %}
+        
+        paymentInfo.style.display = 'none';
+    });
+    
+    paymentSelect.addEventListener('change', function() {
+        const paymentId = this.value;
+        if (paymentId) {
+            {% for payment in unpaid_payments %}
+                if ('{{ payment.id }}' == paymentId) {
+                    document.getElementById('service-name').textContent = '{{ payment.service_name }}';
+                    document.getElementById('amount').textContent = '{{ payment.amount }}';
+                    document.getElementById('payment-date').textContent = '{{ payment.paid_at|date:"d/m/Y" }}';
+                    paymentInfo.style.display = 'block';
+                }
+            {% endfor %}
+        } else {
+            paymentInfo.style.display = 'none';
+        }
+    });
+    
+    // Validation du numéro de transaction
+    const transactionRef = document.getElementById('transaction_reference');
+    transactionRef.addEventListener('blur', function() {
+        const ref = this.value.trim();
+        if (ref) {
+            // TODO: Appeler l'API de validation
+            console.log('Validation du numéro:', ref);
+        }
+    });
+});
+</script>
+{% endblock %}
