@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views_user, views_formations
+from . import views_user, views_formations, views_trading
 
 urlpatterns = [
     # Dashboard utilisateur
@@ -15,6 +15,13 @@ urlpatterns = [
     path('formations/<int:enrollment_id>/sessions/', views_formations.formation_sessions, name='formation-sessions'),
     path('formations/next-sessions/', views_formations.next_formations_sessions, name='next-formations-sessions'),
     path('sessions/<int:session_id>/attend/', views_formations.mark_session_attended, name='mark-session-attended'),
+    
+    # Trading (Historique MetaTrader)
+    path('trading/accounts/', views_trading.trading_accounts_list, name='trading-accounts'),
+    path('trading/accounts/create/', views_trading.create_trading_account, name='create-trading-account'),
+    path('trading/accounts/<int:account_id>/regenerate-key/', views_trading.regenerate_api_key, name='regenerate-api-key'),
+    path('trading/history/', views_trading.trading_history, name='trading-history'),
+    path('trading/ea/sync/', views_trading.receive_trade_from_ea, name='receive-trade-ea'),  # Pour l'EA
     
     # Abonnements
     path('subscriptions/', views_user.user_subscriptions, name='user-subscriptions'),
