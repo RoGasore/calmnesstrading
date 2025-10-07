@@ -1,0 +1,339 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard Formations{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Dashboard Formations
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Statistiques -->
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ total_formations }}</h3>
+                                    <p>Formations Total</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <a href="{% url 'admin_formations_list' %}" class="small-box-footer">
+                                    Plus d'infos <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ active_formations }}</h3>
+                                    <p>Formations Actives</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <a href="{% url 'admin_formations_list' %}?status=active" class="small-box-footer">
+                                    Plus d'infos <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-warning">
+                                <div class="inner">
+                                    <h3>{{ total_sessions }}</h3>
+                                    <p>Sessions Total</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <a href="{% url 'admin_sessions_list' %}" class="small-box-footer">
+                                    Plus d'infos <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-3 col-6">
+                            <div class="small-box bg-danger">
+                                <div class="inner">
+                                    <h3>{{ upcoming_sessions }}</h3>
+                                    <p>Sessions à Venir</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <a href="{% url 'admin_sessions_list' %}?status=scheduled" class="small-box-footer">
+                                    Plus d'infos <i class="fas fa-arrow-circle-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Sessions à venir -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-calendar-check"></i>
+                                        Sessions à Venir (7 prochains jours)
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    {% if upcoming_sessions_list %}
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Formation</th>
+                                                        <th>Date</th>
+                                                        <th>Formateur</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for session in upcoming_sessions_list %}
+                                                    <tr>
+                                                        <td>
+                                                            <strong>{{ session.title }}</strong><br>
+                                                            <small class="text-muted">{{ session.formation.name }}</small>
+                                                        </td>
+                                                        <td>
+                                                            {{ session.scheduled_date|date:"d/m/Y" }}<br>
+                                                            <small class="text-muted">{{ session.scheduled_date|time:"H:i" }}</small>
+                                                        </td>
+                                                        <td>
+                                                            {% if session.instructor %}
+                                                                {{ session.instructor.get_full_name }}
+                                                            {% else %}
+                                                                <span class="text-muted">Non assigné</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{% url 'admin_session_detail' session.id %}" 
+                                                               class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted">Aucune session à venir dans les 7 prochains jours.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sessions en cours -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-play-circle"></i>
+                                        Sessions en Cours
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    {% if ongoing_sessions %}
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Formation</th>
+                                                        <th>Début</th>
+                                                        <th>Formateur</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for session in ongoing_sessions %}
+                                                    <tr>
+                                                        <td>
+                                                            <strong>{{ session.title }}</strong><br>
+                                                            <small class="text-muted">{{ session.formation.name }}</small>
+                                                        </td>
+                                                        <td>
+                                                            {% if session.actual_start_time %}
+                                                                {{ session.actual_start_time|date:"d/m/Y H:i" }}
+                                                            {% else %}
+                                                                {{ session.scheduled_date|date:"d/m/Y H:i" }}
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            {% if session.instructor %}
+                                                                {{ session.instructor.get_full_name }}
+                                                            {% else %}
+                                                                <span class="text-muted">Non assigné</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{% url 'admin_session_detail' session.id %}" 
+                                                               class="btn btn-sm btn-success">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <button class="btn btn-sm btn-warning" 
+                                                                    onclick="endSession({{ session.id }})">
+                                                                <i class="fas fa-stop"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-muted">Aucune session en cours actuellement.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications en attente -->
+                    {% if pending_notifications %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-bell"></i>
+                                        Notifications en Attente
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Session</th>
+                                                    <th>Type</th>
+                                                    <th>Envoi prévu</th>
+                                                    <th>Canaux</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for notification in pending_notifications %}
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ notification.session.title }}</strong><br>
+                                                        <small class="text-muted">{{ notification.session.formation.name }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge badge-info">
+                                                            {{ notification.get_notification_type_display }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {{ notification.get_send_time|date:"d/m/Y H:i" }}<br>
+                                                        <small class="text-muted">
+                                                            {{ notification.send_before_minutes }} min avant
+                                                        </small>
+                                                    </td>
+                                                    <td>
+                                                        {% for channel in notification.channels %}
+                                                            <span class="badge badge-secondary">{{ channel }}</span>
+                                                        {% endfor %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'admin_session_detail' notification.session.id %}" 
+                                                           class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Actions rapides -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <i class="fas fa-bolt"></i>
+                                        Actions Rapides
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <a href="{% url 'admin_create_session' %}" class="btn btn-primary btn-block">
+                                                <i class="fas fa-plus"></i>
+                                                Créer une Session
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'admin_create_schedule' %}" class="btn btn-success btn-block">
+                                                <i class="fas fa-calendar-plus"></i>
+                                                Créer une Programmation
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'admin_formations_list' %}" class="btn btn-info btn-block">
+                                                <i class="fas fa-list"></i>
+                                                Gérer les Formations
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <a href="{% url 'admin_sessions_list' %}" class="btn btn-warning btn-block">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                Gérer les Sessions
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function endSession(sessionId) {
+    if (confirm('Êtes-vous sûr de vouloir terminer cette session ?')) {
+        fetch(`/api/sessions/${sessionId}/end/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erreur: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erreur lors de la fin de session');
+        });
+    }
+}
+</script>
+{% endblock %}

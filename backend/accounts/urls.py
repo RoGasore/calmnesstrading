@@ -30,4 +30,7 @@ urlpatterns = [
     # Vue d'ensemble admin
     path('admin/overview/stats/', admin_overview_stats, name='admin_overview_stats'),
     path('admin/overview/activity/', admin_recent_activity, name='admin_recent_activity'),
+    
+    # Formations admin
+    path('', include('accounts.urls_formations_admin')),
 ]

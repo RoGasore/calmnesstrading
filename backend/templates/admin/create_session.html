@@ -1,0 +1,143 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Créer une Session{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-plus"></i>
+                        Créer une Session de Formation
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="createSessionForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="formation_id">Formation *</label>
+                                    <select class="form-control" id="formation_id" name="formation_id" required>
+                                        <option value="">Sélectionner une formation</option>
+                                        {% for formation in formations %}
+                                            <option value="{{ formation.id }}">{{ formation.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="instructor_id">Formateur</label>
+                                    <select class="form-control" id="instructor_id" name="instructor_id">
+                                        <option value="">Sélectionner un formateur</option>
+                                        {% for instructor in instructors %}
+                                            <option value="{{ instructor.id }}">{{ instructor.get_full_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="title">Titre de la Session *</label>
+                                    <input type="text" class="form-control" id="title" name="title" required
+                                           placeholder="Ex: Introduction à l'analyse technique">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="platform">Plateforme *</label>
+                                    <select class="form-control" id="platform" name="platform" required>
+                                        {% for value, label in platform_choices %}
+                                            <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="scheduled_date">Date et Heure *</label>
+                                    <input type="datetime-local" class="form-control" id="scheduled_date" 
+                                           name="scheduled_date" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="meeting_link">Lien de la Réunion</label>
+                                    <input type="url" class="form-control" id="meeting_link" name="meeting_link"
+                                           placeholder="https://zoom.us/j/... ou https://meet.google.com/...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"
+                                      placeholder="Description détaillée de la session..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Créer la Session
+                            </button>
+                            <a href="{% url 'admin_sessions_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Retour à la Liste
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Définir la date/heure par défaut (demain à 19h)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(19, 0, 0, 0);
+    
+    const datetimeInput = document.getElementById('scheduled_date');
+    datetimeInput.value = tomorrow.toISOString().slice(0, 16);
+    
+    // Mise à jour automatique du titre basé sur la formation
+    const formationSelect = document.getElementById('formation_id');
+    const titleInput = document.getElementById('title');
+    
+    formationSelect.addEventListener('change', function() {
+        if (this.value && !titleInput.value) {
+            const formationName = this.options[this.selectedIndex].text;
+            titleInput.value = formationName + ' - Session';
+        }
+    });
+    
+    // Validation du formulaire
+    document.getElementById('createSessionForm').addEventListener('submit', function(e) {
+        const scheduledDate = new Date(document.getElementById('scheduled_date').value);
+        const now = new Date();
+        
+        if (scheduledDate <= now) {
+            e.preventDefault();
+            alert('La date de la session doit être dans le futur.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

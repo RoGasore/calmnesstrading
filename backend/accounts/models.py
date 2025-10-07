@@ -596,3 +596,7 @@ class TradingStatistics(models.Model):
         return f"{self.user.email} - {self.period_type} ({self.period_start})"
 
 
+# Import des modèles de formations admin
+from .models_formations_admin import (
+    FormationSchedule, AdminFormationSession, AdminSessionNotification, AdminSessionAttendance
+)
