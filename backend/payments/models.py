@@ -5,6 +5,9 @@ from datetime import timedelta
 
 User = get_user_model()
 
+# Import des modèles de facturation
+from .models_invoice import Invoice, InvoiceItem, InvoiceTemplate
+
 
 class Offer(models.Model):
     """Modèle pour les offres disponibles (abonnements, formations, etc.)"""
@@ -134,6 +137,9 @@ class Payment(models.Model):
     validated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='validated_completed_payments', verbose_name="Validé par")
     admin_notes = models.TextField(blank=True, verbose_name="Notes admin")
     
+    # Lien vers la facture (ajouté pour le système de facturation)
+    invoice = models.ForeignKey('payments.Invoice', on_delete=models.SET_NULL, null=True, blank=True, related_name='payments', verbose_name="Facture")
+    
     class Meta:
         verbose_name = "Paiement"
         verbose_name_plural = "Paiements"
@@ -141,6 +147,11 @@ class Payment(models.Model):
     
     def __str__(self):
         return f"{self.user.email} - {self.offer.name} - {self.amount} {self.currency}"
+    
+    @property
+    def service_name(self):
+        """Nom du service pour la facturation"""
+        return self.offer.name
 
 
 class Subscription(models.Model):
