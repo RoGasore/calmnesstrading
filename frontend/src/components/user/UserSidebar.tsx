@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { 
   Home, 
   User, 
@@ -10,7 +10,8 @@ import {
   GraduationCap,
   TrendingUp,
   Wallet,
-  Target
+  Target,
+  LogOut
 } from "lucide-react";
 import {
   Sidebar,
@@ -24,6 +25,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@/contexts/AuthContext";
 
 const userMenuSections = [
   {
@@ -49,7 +51,7 @@ const userMenuSections = [
     ]
   },
   {
-    label: "Paramètres",
+    label: "Configuration",
     items: [
       { title: "Notifications", url: "/user/notifications", icon: Bell },
       { title: "Paramètres", url: "/user/settings", icon: Settings },
@@ -59,7 +61,9 @@ const userMenuSections = [
 
 export function UserSidebar() {
   const { state } = useSidebar();
+  const { logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
 
@@ -68,6 +72,11 @@ export function UserSidebar() {
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-primary/10 text-primary font-medium border-r-2 border-primary" : "hover:bg-muted/50";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <Sidebar
@@ -104,6 +113,23 @@ export function UserSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
+        
+        {/* Section Déconnexion */}
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={handleLogout}
+                  className="hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  {!collapsed && <span>Déconnexion</span>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
