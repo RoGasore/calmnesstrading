@@ -51,6 +51,7 @@ class PageView(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     
     class Meta:
+        app_label = 'analytics'
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['session_id', 'created_at']),
@@ -104,6 +105,7 @@ class UserSession(models.Model):
     utm_campaign = models.CharField(max_length=255, blank=True)
     
     class Meta:
+        app_label = 'analytics'
         ordering = ['-start_time']
         indexes = [
             models.Index(fields=['user', 'start_time']),
@@ -184,6 +186,7 @@ class TradingPerformance(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     
     class Meta:
+        app_label = 'analytics'
         ordering = ['-ranking_score']
         verbose_name = "Trading Performance"
         verbose_name_plural = "Trading Performances"
@@ -350,6 +353,7 @@ class AnalyticsSummary(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
+        app_label = 'analytics'
         ordering = ['-date']
         verbose_name = "Analytics Summary"
         verbose_name_plural = "Analytics Summaries"
@@ -482,6 +486,7 @@ class UserDemographics(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
+        app_label = 'analytics'
         verbose_name = "User Demographics"
         verbose_name_plural = "User Demographics"
     
