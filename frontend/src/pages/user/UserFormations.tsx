@@ -82,21 +82,22 @@ export function UserFormations() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="lg:hidden" />
           <div>
-            <h1 className="text-3xl font-bold">Mes Formations</h1>
-            <p className="text-muted-foreground">
-              Suivez votre progression et continuez votre apprentissage
+            <h1 className="text-2xl sm:text-3xl font-bold">Mes Formations</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Suivez vos formations et rejoignez les sessions en direct
             </p>
           </div>
         </div>
-        <Button onClick={() => navigate('/services')}>
+        <Button onClick={() => navigate('/services')} className="w-full sm:w-auto">
           <GraduationCap className="mr-2 h-4 w-4" />
-          Explorer les formations
+          <span className="hidden sm:inline">Explorer les formations</span>
+          <span className="sm:hidden">Explorer</span>
         </Button>
       </div>
 

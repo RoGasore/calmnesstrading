@@ -81,30 +81,30 @@ export function UserProfile() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="lg:hidden" />
           <div>
-            <h1 className="text-3xl font-bold">Mon Profil</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Mon Profil</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Gérez vos informations personnelles et vos préférences
             </p>
           </div>
         </div>
         {!isEditing ? (
-          <Button onClick={() => setIsEditing(true)}>
+          <Button onClick={() => setIsEditing(true)} className="w-full sm:w-auto">
             <Edit2 className="mr-2 h-4 w-4" />
             Modifier
           </Button>
         ) : (
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>
+          <div className="flex gap-2 flex-col sm:flex-row">
+            <Button variant="outline" onClick={() => setIsEditing(false)} className="w-full sm:w-auto">
               <X className="mr-2 h-4 w-4" />
               Annuler
             </Button>
-            <Button onClick={handleSave} disabled={loading}>
+            <Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto">
               <Save className="mr-2 h-4 w-4" />
               {loading ? 'Enregistrement...' : 'Enregistrer'}
             </Button>

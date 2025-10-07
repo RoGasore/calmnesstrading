@@ -109,21 +109,22 @@ export function UserPayments() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="lg:hidden" />
           <div>
-            <h1 className="text-3xl font-bold">Mes Paiements</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Mes Paiements</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Gérez vos paiements et abonnements
             </p>
           </div>
         </div>
-        <Button onClick={() => navigate('/services')}>
+        <Button onClick={() => navigate('/services')} className="w-full sm:w-auto">
           <TrendingUp className="mr-2 h-4 w-4" />
-          Découvrir nos services
+          <span className="hidden sm:inline">Découvrir nos services</span>
+          <span className="sm:hidden">Services</span>
         </Button>
       </div>
 

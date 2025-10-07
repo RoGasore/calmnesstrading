@@ -139,14 +139,14 @@ export function UserNotifications() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* En-tête */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="lg:hidden" />
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Bell className="h-8 w-8" />
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+              <Bell className="h-6 w-6 sm:h-8 sm:w-8" />
               Notifications
               {unreadCount > 0 && (
                 <Badge variant="destructive" className="ml-2">
@@ -154,15 +154,16 @@ export function UserNotifications() {
                 </Badge>
               )}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Gérez vos notifications et alertes
             </p>
           </div>
         </div>
         {unreadCount > 0 && (
-          <Button onClick={markAllAsRead} variant="outline">
+          <Button onClick={markAllAsRead} variant="outline" className="w-full sm:w-auto" size="sm">
             <CheckCircle2 className="mr-2 h-4 w-4" />
-            Tout marquer comme lu
+            <span className="hidden sm:inline">Tout marquer comme lu</span>
+            <span className="sm:hidden">Tout lire</span>
           </Button>
         )}
       </div>
