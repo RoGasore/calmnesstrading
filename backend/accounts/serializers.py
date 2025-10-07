@@ -58,10 +58,18 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
     is_verified = serializers.ReadOnlyField()
+    profile_complete = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "full_name", "phone", "telegram_username", "is_staff", "is_verified", "created_at"]
+        fields = [
+            "id", "username", "email", "first_name", "last_name", "full_name", 
+            "phone", "telegram_username", "discord_username", "whatsapp_number",
+            "is_staff", "is_verified", "can_make_payment", "profile_complete", "created_at"
+        ]
+    
+    def get_profile_complete(self, obj):
+        return obj.has_complete_profile()
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -75,9 +83,18 @@ class AdminUserSerializer(serializers.ModelSerializer):
     is_verified = serializers.ReadOnlyField()
     created_at = serializers.ReadOnlyField()
     last_login = serializers.ReadOnlyField()
+    profile_complete = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ["id", "username", "email", "first_name", "last_name", "full_name", "phone", "telegram_username", "is_staff", "is_active", "is_verified", "created_at", "last_login", "date_joined"]
+        fields = [
+            "id", "username", "email", "first_name", "last_name", "full_name", 
+            "phone", "telegram_username", "discord_username", "whatsapp_number",
+            "is_staff", "is_active", "is_verified", "can_make_payment", "profile_complete",
+            "created_at", "last_login", "date_joined"
+        ]
+    
+    def get_profile_complete(self, obj):
+        return obj.has_complete_profile()
 
 
