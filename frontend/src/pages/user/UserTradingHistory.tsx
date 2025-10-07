@@ -31,19 +31,24 @@ import {
   Clock,
   DollarSign,
   Target,
-  BarChart3
+  BarChart3,
+  ArrowRight
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function UserTradingHistory() {
   const { fetchWithAuth } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [trades, setTrades] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
   const [hasEA, setHasEA] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
   
   // Filtres
   const [period, setPeriod] = useState('all');
@@ -56,11 +61,19 @@ export function UserTradingHistory() {
   const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
   useEffect(() => {
-    fetchAccounts();
+    // Vérifier si la fonctionnalité est activée
+    const enabled = localStorage.getItem('trading_history_enabled') === 'true';
+    setIsEnabled(enabled);
+    
+    if (enabled) {
+      fetchAccounts();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    if (accounts.length > 0) {
+    if (accounts.length > 0 && isEnabled) {
       fetchHistory();
     }
   }, [period, tradeStatus, resultFilter, selectedAccount, startDate, endDate]);
@@ -130,9 +143,10 @@ export function UserTradingHistory() {
     );
   };
 
-  if (!hasEA && !loading) {
+  // Si la fonctionnalité n'est pas activée
+  if (!isEnabled && !loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="lg:hidden" />
           <div>
@@ -145,42 +159,177 @@ export function UserTradingHistory() {
 
         <Card className="border-2 border-dashed">
           <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-muted rounded-full flex items-center justify-center">
+              <BarChart3 className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <CardTitle className="text-xl sm:text-2xl">Fonctionnalité Désactivée</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
+              L'historique de trading MetaTrader est actuellement désactivé
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Activez cette fonctionnalité</AlertTitle>
+              <AlertDescription className="text-sm">
+                Pour suivre vos trades MetaTrader sur votre dashboard, vous devez d'abord activer cette fonctionnalité dans vos paramètres.
+              </AlertDescription>
+            </Alert>
+
+            <div className="bg-muted/50 p-4 sm:p-6 rounded-lg space-y-4">
+              <h3 className="font-semibold flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                Qu'est-ce que l'historique de trading ?
+              </h3>
+              <ul className="text-sm space-y-2">
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <span><strong>Synchronisation automatique</strong> de vos trades depuis MetaTrader 4/5</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <span><strong>Statistiques détaillées</strong> : Win Rate, Profit Factor, Profit/Perte</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <span><strong>Filtres avancés</strong> : Par période, statut, résultat, symbole</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <span><strong>Export Excel</strong> pour analyse approfondie</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-primary mt-0.5">•</span>
+                  <span><strong>Accessible partout</strong> : Web, mobile, tablette</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Sécurité et confidentialité
+              </h4>
+              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                <li>✓ L'Expert Advisor est en <strong>lecture seule</strong></li>
+                <li>✓ Il ne peut <strong>PAS</strong> ouvrir, modifier ou fermer vos trades</li>
+                <li>✓ Il lit uniquement votre historique pour l'afficher sur le dashboard</li>
+                <li>✓ Vos données sont sécurisées et privées</li>
+                <li>✓ Vous pouvez désactiver à tout moment</li>
+              </ul>
+            </div>
+
+            <Button className="w-full" size="lg" onClick={() => navigate('/user/settings')}>
+              <Settings className="mr-2 h-5 w-5" />
+              Activer dans les Paramètres
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+
+            <p className="text-xs sm:text-sm text-center text-muted-foreground">
+              Une fois activé, suivez les instructions pour installer l'Expert Advisor
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Si activé mais pas d'EA installé
+  if (isEnabled && !hasEA && !loading) {
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="lg:hidden" />
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">Historique de Trading</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Suivez tous vos trades MetaTrader en temps réel
+            </p>
+          </div>
+        </div>
+
+        <Alert className="border-blue-500">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Fonctionnalité activée</AlertTitle>
+          <AlertDescription>
+            L'historique de trading est activé. Suivez les étapes ci-dessous pour installer l'Expert Advisor.
+          </AlertDescription>
+        </Alert>
+
+        <Card className="border-2 border-primary">
+          <CardHeader className="text-center">
             <div className="mx-auto mb-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
               <BarChart3 className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle className="text-xl sm:text-2xl">Connectez votre compte MetaTrader</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">Installez l'Expert Advisor</CardTitle>
             <CardDescription className="text-sm sm:text-base">
-              Pour voir l'historique complet de vos trades, installez notre Expert Advisor sur votre MetaTrader
+              Pour que vos trades apparaissent automatiquement sur votre dashboard
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-muted/50 p-4 sm:p-6 rounded-lg space-y-4">
               <h3 className="font-semibold flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-primary" />
-                Comment ça marche ?
+                Installation en 5 étapes simples
               </h3>
-              <ol className="text-sm space-y-2 list-decimal list-inside">
-                <li>Téléchargez notre script Expert Advisor (EA)</li>
-                <li>Installez-le sur votre MetaTrader 4 ou 5</li>
-                <li>Configurez votre clé API unique</li>
-                <li>L'EA enverra automatiquement vos trades sur votre dashboard</li>
-                <li>Suivez votre performance en temps réel !</li>
+              <ol className="text-sm space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-xs font-bold">1</span>
+                  <div>
+                    <strong>Téléchargez</strong> le script Expert Advisor (EA) en cliquant sur le bouton ci-dessous
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-xs font-bold">2</span>
+                  <div>
+                    <strong>Installez-le</strong> sur votre MetaTrader 4 ou 5 en suivant le guide PDF inclus
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-xs font-bold">3</span>
+                  <div>
+                    <strong>Configurez</strong> votre clé API unique (fournie dans les Paramètres)
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-xs font-bold">4</span>
+                  <div>
+                    <strong>Activez</strong> l'EA sur un graphique dans MetaTrader (bouton Auto Trading)
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 text-xs font-bold">5</span>
+                  <div>
+                    <strong>C'est tout !</strong> Vos trades apparaîtront automatiquement dans 1-2 minutes
+                  </div>
+                </li>
               </ol>
             </div>
+
+            <Alert className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-500">
+              <AlertCircle className="h-4 w-4 text-yellow-600" />
+              <AlertTitle className="text-yellow-900 dark:text-yellow-100">Important</AlertTitle>
+              <AlertDescription className="text-sm text-yellow-800 dark:text-yellow-200 space-y-1">
+                <p>• L'EA doit rester <strong>ACTIVÉ</strong> dans votre MetaTrader pour que la synchronisation fonctionne</p>
+                <p>• Si vous fermez MetaTrader, la synchronisation s'arrêtera jusqu'à sa réouverture</p>
+                <p>• L'EA <strong>NE PREND AUCUN TRADE</strong> - Il lit uniquement votre historique (sécurité garantie)</p>
+                <p>• Vous pouvez désactiver cette fonctionnalité dans les Paramètres à tout moment</p>
+              </AlertDescription>
+            </Alert>
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button className="flex-1" size="lg" onClick={downloadEA}>
                 <Download className="mr-2 h-5 w-5" />
                 Télécharger le Script EA
               </Button>
-              <Button variant="outline" size="lg" onClick={fetchAccounts}>
-                <RefreshCw className="mr-2 h-5 w-5" />
-                Actualiser
+              <Button variant="outline" size="lg" onClick={() => navigate('/user/settings')}>
+                <Settings className="mr-2 h-5 w-5" />
+                Paramètres
               </Button>
             </div>
 
             <p className="text-xs sm:text-sm text-center text-muted-foreground">
-              Le fichier ZIP contient l'Expert Advisor et un guide d'installation complet (PDF)
+              Le fichier ZIP contient l'Expert Advisor (.mq4) et un guide d'installation complet en PDF
             </p>
           </CardContent>
         </Card>

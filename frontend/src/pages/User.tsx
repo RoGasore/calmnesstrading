@@ -7,6 +7,7 @@ import { UserSignaux } from "./user/UserSignaux";
 import { UserPayments } from "./user/UserPayments";
 import { UserNotifications } from "./user/UserNotifications";
 import { UserTradingHistory } from "./user/UserTradingHistory";
+import { UserSettings } from "./user/UserSettings";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -41,9 +42,9 @@ export default function User() {
         <Route path="payments" element={<UserPayments />} />
         <Route path="notifications" element={<UserNotifications />} />
         <Route path="trading-history" element={<UserTradingHistory />} />
+        <Route path="settings" element={<UserSettings />} />
         <Route path="gestion" element={<UserDashboard />} /> {/* TODO: Créer la page UserGestion */}
         <Route path="wallet" element={<UserDashboard />} /> {/* TODO: Créer la page UserWallet */}
-        <Route path="settings" element={<UserDashboard />} /> {/* TODO: Créer la page UserSettings */}
         <Route path="*" element={<Navigate to="/user" replace />} />
       </Routes>
     </UserLayout>
