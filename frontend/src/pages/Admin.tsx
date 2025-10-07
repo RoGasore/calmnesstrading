@@ -8,7 +8,7 @@ import AdminPayments from "./admin/AdminPayments";
 import AdminRevenue from "./admin/AdminRevenue";
 import { UsersManagement } from "@/components/admin/UsersManagement";
 import { ReviewsManagement } from "@/components/admin/ReviewsManagement";
-import { AnalyticsPage } from "@/components/admin/AnalyticsPage";
+import { AnalyticsPageNew } from "@/components/admin/AnalyticsPageNew";
 import { RevenueManagement } from "@/components/admin/RevenueManagement";
 import { FormationsManagement } from "@/components/admin/FormationsManagement";
 import { SignauxManagement } from "@/components/admin/SignauxManagement";
@@ -78,7 +78,7 @@ const Admin = () => {
         <Route path="/formations" element={<FormationsManagement />} />
         <Route path="/signaux" element={<SignauxManagement />} />
         <Route path="/gestion" element={<GestionManagement />} />
-        <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/analytics" element={<AnalyticsPageNew />} />
         <Route path="/content" element={<ContentManagement />} />
         <Route path="/content-new" element={<ContentManagementNew />} />
         <Route path="/content-unified" element={<ContentManagementUnified />} />
