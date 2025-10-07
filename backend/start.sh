@@ -31,6 +31,10 @@ python manage.py init_production_cms
 echo "👤 Synchronisation de l'utilisateur admin..."
 python manage.py sync_admin_user
 
+# Créer l'utilisateur de test (pour le développement)
+echo "👥 Création de l'utilisateur de test..."
+python manage.py create_test_user
+
 # Note: Les données CMS sont gérées via l'interface d'administration
 
 # Démarrer l'application
