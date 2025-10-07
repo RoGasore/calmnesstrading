@@ -196,3 +196,202 @@ class UserNotification(models.Model):
         self.save(update_fields=['status', 'read_at'])
 
 
+class Formation(models.Model):
+    """Modèle pour les formations disponibles (sessions externes Zoom/Meet)"""
+    
+    PLATFORM_CHOICES = [
+        ('zoom', 'Zoom'),
+        ('google_meet', 'Google Meet'),
+        ('teams', 'Microsoft Teams'),
+        ('other', 'Autre'),
+    ]
+    
+    LEVEL_CHOICES = [
+        ('beginner', 'Débutant'),
+        ('intermediate', 'Intermédiaire'),
+        ('advanced', 'Avancé'),
+        ('expert', 'Expert'),
+    ]
+    
+    # Informations de base
+    name = models.CharField(max_length=200, verbose_name="Nom de la formation")
+    description = models.TextField(verbose_name="Description")
+    level = models.CharField(max_length=20, choices=LEVEL_CHOICES, verbose_name="Niveau")
+    
+    # Liens d'accès (Zoom/Meet)
+    platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES, verbose_name="Plateforme")
+    meeting_link = models.URLField(verbose_name="Lien de session", help_text="Lien Zoom ou Google Meet")
+    meeting_id = models.CharField(max_length=100, blank=True, verbose_name="ID de réunion")
+    meeting_password = models.CharField(max_length=100, blank=True, verbose_name="Mot de passe")
+    
+    # Formateur
+    instructor_name = models.CharField(max_length=200, verbose_name="Nom du formateur")
+    instructor_bio = models.TextField(blank=True, verbose_name="Bio du formateur")
+    
+    # Planning
+    schedule_description = models.CharField(
+        max_length=200, 
+        verbose_name="Description du planning",
+        help_text="Ex: Lun-Ven, 18h-20h"
+    )
+    
+    # Métadonnées
+    is_active = models.BooleanField(default=True, verbose_name="Active")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Formation"
+        verbose_name_plural = "Formations"
+        ordering = ['level', 'name']
+    
+    def __str__(self):
+        return f"{self.name} ({self.level})"
+
+
+class UserFormationEnrollment(models.Model):
+    """Inscription d'un utilisateur à une formation"""
+    
+    STATUS_CHOICES = [
+        ('upcoming', 'À venir'),
+        ('active', 'En cours'),
+        ('completed', 'Terminée'),
+        ('cancelled', 'Annulée'),
+    ]
+    
+    # Relations
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='formation_enrollments')
+    formation = models.ForeignKey(Formation, on_delete=models.CASCADE, related_name='enrollments')
+    
+    # Dates
+    enrolled_at = models.DateTimeField(auto_now_add=True, verbose_name="Inscrit le")
+    start_date = models.DateField(verbose_name="Date de début")
+    end_date = models.DateField(verbose_name="Date de fin")
+    
+    # Statut
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='upcoming')
+    
+    # Sessions
+    next_session_date = models.DateTimeField(null=True, blank=True, verbose_name="Prochaine session")
+    total_sessions = models.IntegerField(default=0, verbose_name="Total de sessions")
+    attended_sessions = models.IntegerField(default=0, verbose_name="Sessions suivies")
+    
+    # Notes et feedback
+    user_notes = models.TextField(blank=True, verbose_name="Notes personnelles")
+    completion_certificate = models.FileField(
+        upload_to='certificates/', 
+        null=True, 
+        blank=True,
+        verbose_name="Certificat de complétion"
+    )
+    
+    # Métadonnées
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Inscription Formation"
+        verbose_name_plural = "Inscriptions Formations"
+        ordering = ['-enrolled_at']
+        unique_together = ['user', 'formation', 'start_date']
+        indexes = [
+            models.Index(fields=['user', 'status']),
+            models.Index(fields=['next_session_date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.formation.name}"
+    
+    def is_active(self):
+        """Vérifie si la formation est active"""
+        now = timezone.now().date()
+        return (
+            self.status == 'active' and 
+            self.start_date <= now <= self.end_date
+        )
+    
+    def days_until_start(self):
+        """Calcule le nombre de jours avant le début"""
+        if self.status != 'upcoming':
+            return 0
+        delta = self.start_date - timezone.now().date()
+        return max(0, delta.days)
+    
+    def days_until_end(self):
+        """Calcule le nombre de jours avant la fin"""
+        if self.status not in ['active', 'upcoming']:
+            return 0
+        delta = self.end_date - timezone.now().date()
+        return max(0, delta.days)
+    
+    def attendance_rate(self):
+        """Calcule le taux de présence"""
+        if self.total_sessions == 0:
+            return 0
+        return round((self.attended_sessions / self.total_sessions) * 100, 2)
+
+
+class FormationSession(models.Model):
+    """Session individuelle d'une formation"""
+    
+    STATUS_CHOICES = [
+        ('scheduled', 'Planifiée'),
+        ('ongoing', 'En cours'),
+        ('completed', 'Terminée'),
+        ('cancelled', 'Annulée'),
+    ]
+    
+    # Relations
+    formation = models.ForeignKey(Formation, on_delete=models.CASCADE, related_name='sessions')
+    enrollment = models.ForeignKey(
+        UserFormationEnrollment, 
+        on_delete=models.CASCADE, 
+        related_name='sessions',
+        null=True,
+        blank=True
+    )
+    
+    # Informations de session
+    session_number = models.IntegerField(verbose_name="Numéro de session")
+    title = models.CharField(max_length=200, verbose_name="Titre de la session")
+    description = models.TextField(blank=True, verbose_name="Description")
+    
+    # Date et heure
+    scheduled_date = models.DateTimeField(verbose_name="Date et heure")
+    duration_minutes = models.IntegerField(default=120, verbose_name="Durée (minutes)")
+    
+    # Lien (peut être différent du lien principal)
+    meeting_link = models.URLField(blank=True, verbose_name="Lien de cette session")
+    
+    # Enregistrement
+    recording_link = models.URLField(blank=True, verbose_name="Lien d'enregistrement")
+    
+    # Statut
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    
+    # Présence
+    user_attended = models.BooleanField(default=False, verbose_name="Utilisateur présent")
+    
+    # Métadonnées
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Session de Formation"
+        verbose_name_plural = "Sessions de Formation"
+        ordering = ['scheduled_date']
+        indexes = [
+            models.Index(fields=['scheduled_date', 'status']),
+        ]
+    
+    def __str__(self):
+        return f"{self.formation.name} - Session {self.session_number}"
+    
+    def is_upcoming(self):
+        """Vérifie si la session est à venir"""
+        return self.scheduled_date > timezone.now() and self.status == 'scheduled'
+    
+    def is_past(self):
+        """Vérifie si la session est passée"""
+        return self.scheduled_date < timezone.now()
+
+
