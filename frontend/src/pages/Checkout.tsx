@@ -22,6 +22,9 @@ const Checkout = () => {
   const { toast } = useToast();
 
   const offerId = searchParams.get('offer');
+  const offerType = searchParams.get('type');
+  const planName = searchParams.get('plan');
+  
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   const [selectedContactMethod, setSelectedContactMethod] = useState<string>('');
   const [contactInfo, setContactInfo] = useState('');
@@ -29,22 +32,51 @@ const Checkout = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login?redirect=/checkout' + (offerId ? `?offer=${offerId}` : ''));
+      const redirectUrl = '/checkout' + 
+        (offerId ? `?offer=${offerId}` : '') +
+        (offerType ? `&type=${offerType}` : '') +
+        (planName ? `&plan=${planName}` : '');
+      navigate('/login?redirect=' + encodeURIComponent(redirectUrl));
       return;
     }
 
     fetchOffers();
     fetchContactChannels();
-  }, [isAuthenticated, navigate, offerId, fetchOffers, fetchContactChannels]);
+  }, [isAuthenticated, navigate, offerId, offerType, planName, fetchOffers, fetchContactChannels]);
 
   useEffect(() => {
-    if (offerId && offers.length > 0) {
-      const offer = offers.find(o => o.id === parseInt(offerId));
+    if (offers.length > 0) {
+      let offer: Offer | undefined;
+      
+      // Méthode 1: Par ID direct
+      if (offerId) {
+        offer = offers.find(o => o.id === parseInt(offerId));
+      }
+      
+      // Méthode 2: Par type et nom de plan
+      if (!offer && offerType && planName) {
+        console.log('Recherche offre:', { offerType, planName, availableOffers: offers });
+        
+        offer = offers.find(o => {
+          const matchesType = o.offer_type === offerType || o.offer_type === offerType + 's';
+          const matchesName = o.name.toLowerCase().includes(planName.toLowerCase());
+          return matchesType && matchesName;
+        });
+        
+        // Fallback: chercher juste par type si pas de correspondance exacte
+        if (!offer) {
+          offer = offers.find(o => o.offer_type === offerType || o.offer_type === offerType + 's');
+        }
+      }
+      
       if (offer) {
+        console.log('Offre sélectionnée:', offer);
         setSelectedOffer(offer);
+      } else {
+        console.warn('Aucune offre trouvée pour:', { offerId, offerType, planName });
       }
     }
-  }, [offerId, offers]);
+  }, [offerId, offerType, planName, offers]);
 
   const getContactMethodIcon = (method: string) => {
     switch (method) {
@@ -236,14 +268,53 @@ const Checkout = () => {
                         </div>
                       </>
                     ) : (
-                      <div className="text-center py-8">
-                        <p className="text-muted-foreground">Aucune offre sélectionnée</p>
-                        <Button
-                          onClick={() => navigate('/tarifs')}
-                          className="mt-4"
-                        >
-                          Voir les offres
-                        </Button>
+                      <div className="space-y-6 py-8">
+                        <div className="text-center">
+                          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                          <h3 className="font-semibold text-lg mb-2">Aucune offre sélectionnée</h3>
+                          <p className="text-muted-foreground mb-4">
+                            Veuillez sélectionner une offre ci-dessous ou retourner à la page des services.
+                          </p>
+                          <div className="flex gap-2 justify-center">
+                            <Button
+                              onClick={() => navigate('/services')}
+                              variant="outline"
+                            >
+                              Voir les services
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Afficher toutes les offres disponibles pour sélection */}
+                        {offers.length > 0 && (
+                          <div className="border-t pt-6">
+                            <h4 className="font-semibold mb-4">Ou choisissez une offre :</h4>
+                            <div className="grid gap-3 md:grid-cols-2">
+                              {offers.slice(0, 6).map(offer => (
+                                <Card 
+                                  key={offer.id}
+                                  className="cursor-pointer hover:border-primary transition-colors"
+                                  onClick={() => setSelectedOffer(offer)}
+                                >
+                                  <CardContent className="p-4">
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <p className="font-semibold">{offer.name}</p>
+                                        <p className="text-sm text-muted-foreground">{offer.description}</p>
+                                      </div>
+                                      <div className="text-right">
+                                        <p className="font-bold text-lg">{offer.price}€</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          {offer.duration_days ? `${offer.duration_days}j` : 'Illimité'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </CardContent>
