@@ -62,6 +62,8 @@ class PendingPayment(models.Model):
     STATUS_CHOICES = [
         ('pending', 'En attente'),
         ('contacted', 'Client contacté'),
+        ('transaction_submitted', 'Transaction soumise'),
+        ('verified', 'Transaction vérifiée'),
         ('confirmed', 'Confirmé'),
         ('cancelled', 'Annulé'),
     ]
@@ -76,9 +78,25 @@ class PendingPayment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pending_payments', verbose_name="Utilisateur")
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, verbose_name="Offre")
     
-    # Informations de contact
-    contact_method = models.CharField(max_length=50, choices=CONTACT_METHOD_CHOICES, verbose_name="Méthode de contact")
-    contact_info = models.CharField(max_length=255, verbose_name="Info de contact", help_text="Pseudo Telegram/Discord, numéro WhatsApp, etc.")
+    # Informations utilisateur (JSON pour flexibilité)
+    user_info = models.JSONField(
+        default=dict, 
+        blank=True,
+        verbose_name="Informations utilisateur",
+        help_text="Nom, email, téléphone, telegram, whatsapp, discord"
+    )
+    
+    # Informations de contact (deprecated, on utilise user_info maintenant)
+    contact_method = models.CharField(max_length=50, choices=CONTACT_METHOD_CHOICES, blank=True, verbose_name="Méthode de contact")
+    contact_info = models.CharField(max_length=255, blank=True, verbose_name="Info de contact", help_text="Pseudo Telegram/Discord, numéro WhatsApp, etc.")
+    
+    # ID de transaction
+    transaction_id = models.CharField(
+        max_length=255, 
+        blank=True, 
+        verbose_name="ID de Transaction",
+        help_text="ID fourni par l'utilisateur après paiement"
+    )
     
     # Montant et devise
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Montant")

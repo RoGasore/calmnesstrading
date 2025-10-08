@@ -25,7 +25,7 @@ import Signaux from "./pages/Signaux";
 // import Analyse from "./pages/Analyse";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
-import Checkout from "./pages/Checkout";
+import CheckoutNew from "./pages/CheckoutNew";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Services from "./components/ServicesCMS";
 import ServicesFormations from "./pages/ServicesFormations";
@@ -48,7 +48,7 @@ function AppContent() {
         <Route path="/course/:courseId" element={<CourseContent />} />
         <Route path="/signaux" element={<Signaux />} />
         {/* <Route path="/analyse" element={<Analyse />} /> */}
-        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout" element={<CheckoutNew />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/faq" element={<FAQ />} />

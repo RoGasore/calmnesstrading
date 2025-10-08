@@ -114,3 +114,42 @@ def user_dashboard(request):
         'total_spent': total_spent
     })
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_transaction_id(request, payment_id):
+    """Soumettre l'ID de transaction après paiement"""
+    
+    try:
+        pending_payment = PendingPayment.objects.get(id=payment_id, user=request.user)
+    except PendingPayment.DoesNotExist:
+        return Response(
+            {'error': 'Paiement non trouvé'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    transaction_id = request.data.get('transaction_id')
+    if not transaction_id:
+        return Response(
+            {'error': 'ID de transaction requis'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Mettre à jour le paiement avec l'ID de transaction
+    pending_payment.transaction_id = transaction_id
+    pending_payment.status = 'transaction_submitted'
+    pending_payment.save()
+    
+    # Historique
+    PaymentHistory.objects.create(
+        pending_payment=pending_payment,
+        action='transaction_submitted',
+        description=f"Transaction ID soumis: {transaction_id}",
+        created_by=request.user
+    )
+    
+    return Response({
+        'success': True,
+        'message': 'Transaction ID enregistré avec succès',
+        'payment': PendingPaymentSerializer(pending_payment).data
+    })
