@@ -447,8 +447,13 @@ const ServicesSignaux = () => {
                         onClick={() => {
                           const planKey = plan.name.toLowerCase();
                           const offerId = offerIds[planKey];
+                          console.log('Plan sélectionné:', planKey, 'Offer ID:', offerId, 'Tous les IDs:', offerIds);
                           if (offerId) {
                             navigate(`/checkout?offer=${offerId}`);
+                          } else {
+                            // Si pas d'ID spécifique, rediriger vers la page checkout générique
+                            console.warn('Aucun offer ID trouvé, redirection générique');
+                            navigate(`/checkout?type=signal&plan=${planKey}`);
                           }
                         }}
                       >

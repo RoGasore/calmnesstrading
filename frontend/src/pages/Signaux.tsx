@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingUp, TrendingDown, Target, Clock, DollarSign, BarChart3, Zap, Shield, Bell, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { EditableLayout } from "@/components/cms/EditableLayout";
 
 const Signaux = () => {
+  const navigate = useNavigate();
   const currentSignals = [
     {
       id: 1,
@@ -328,7 +330,11 @@ const Signaux = () => {
                           </li>
                         ))}
                       </ul>
-                      <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
+                      <Button 
+                        className="w-full" 
+                        variant={plan.popular ? "default" : "outline"}
+                        onClick={() => navigate(`/checkout?type=signal&plan=${plan.name.toLowerCase()}`)}
+                      >
                         Choisir ce plan
                       </Button>
                     </CardContent>
