@@ -57,7 +57,7 @@ def support_message_detail(request, message_id):
                 return Response({'error': 'Le texte de la réponse est requis'}, status=status.HTTP_400_BAD_REQUEST)
             
             # Vérifier que l'utilisateur peut répondre
-            if request.user.role not in ['customer_service', 'admin']:
+            if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
                 return Response({'error': 'Seuls les membres du support peuvent répondre'}, status=status.HTTP_403_FORBIDDEN)
             
             reply = SupportReply.objects.create(
@@ -85,7 +85,7 @@ def support_message_detail(request, message_id):
 @permission_classes([IsAuthenticated])
 def support_clients_list(request):
     """Liste des clients pour le support"""
-    if request.user.role not in ['customer_service', 'admin']:
+    if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
         return Response({'error': 'Accès non autorisé'}, status=status.HTTP_403_FORBIDDEN)
     
     # Récupérer tous les utilisateurs avec leurs informations
@@ -145,7 +145,7 @@ def support_clients_list(request):
 @permission_classes([IsAuthenticated])
 def support_client_detail(request, client_id):
     """Détails d'un client pour le support"""
-    if request.user.role not in ['customer_service', 'admin']:
+    if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
         return Response({'error': 'Accès non autorisé'}, status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -205,7 +205,7 @@ def support_client_detail(request, client_id):
 @permission_classes([IsAuthenticated])
 def support_revenues_stats(request):
     """Statistiques des revenus pour le support"""
-    if request.user.role not in ['customer_service', 'admin']:
+    if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
         return Response({'error': 'Accès non autorisé'}, status=status.HTTP_403_FORBIDDEN)
     
     # Calculer les statistiques
@@ -299,7 +299,7 @@ def support_order_detail(request, order_id):
         
         elif request.method == 'PUT':
             # Mettre à jour la commande
-            if request.user.role not in ['customer_service', 'admin']:
+            if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
                 return Response({'error': 'Seuls les membres du support peuvent modifier les commandes'}, status=status.HTTP_403_FORBIDDEN)
             
             from .serializers_support import SupportOrderSerializer
@@ -354,7 +354,7 @@ def support_invoice_detail(request, invoice_id):
 @permission_classes([IsAuthenticated])
 def support_invoice_generate_pdf(request, invoice_id):
     """Générer le PDF d'une facture"""
-    if request.user.role not in ['customer_service', 'admin']:
+    if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
         return Response({'error': 'Accès non autorisé'}, status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -378,7 +378,7 @@ def support_invoice_generate_pdf(request, invoice_id):
 @permission_classes([IsAuthenticated])
 def support_dashboard_stats(request):
     """Statistiques du dashboard support"""
-    if request.user.role not in ['customer_service', 'admin']:
+    if not (request.user.is_staff or request.user.role in ['customer_service', 'admin']):
         return Response({'error': 'Accès non autorisé'}, status=status.HTTP_403_FORBIDDEN)
     
     # Statistiques générales

@@ -199,6 +199,54 @@ def admin_invoice_pdf(request, invoice_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def admin_invoices_list_api(request):
+    """Liste des factures pour l'admin/service client (API JSON)"""
+    # Vérifier que c'est admin ou service client
+    if not (request.user.is_staff or request.user.role in ['admin', 'customer_service']):
+        return Response({'error': 'Permission refusée'}, status=status.HTTP_403_FORBIDDEN)
+    
+    invoices = Invoice.objects.select_related('customer').all().order_by('-created_at')
+    
+    # Filtres
+    status_filter = request.GET.get('status')
+    if status_filter:
+        invoices = invoices.filter(status=status_filter)
+    
+    search = request.GET.get('search')
+    if search:
+        from django.db import models as db_models
+        invoices = invoices.filter(
+            db_models.Q(invoice_number__icontains=search) |
+            db_models.Q(customer__first_name__icontains=search) |
+            db_models.Q(customer__last_name__icontains=search) |
+            db_models.Q(customer__email__icontains=search)
+        )
+    
+    data = []
+    for invoice in invoices:
+        data.append({
+            'id': invoice.id,
+            'invoice_number': invoice.invoice_number,
+            'user': {
+                'id': invoice.customer.id,
+                'name': f"{invoice.customer.first_name} {invoice.customer.last_name}".strip() or invoice.customer.username,
+                'email': invoice.customer.email
+            },
+            'total_amount': float(invoice.total_ttc),
+            'currency': 'EUR',
+            'status': invoice.status,
+            'created_at': invoice.created_at.isoformat() if hasattr(invoice, 'created_at') else invoice.issue_date.isoformat(),
+            'due_date': invoice.due_date.isoformat() if invoice.due_date else None,
+            'paid_at': invoice.payment_date.isoformat() if invoice.payment_date else None,
+            'payment_method': getattr(invoice, 'payment_method', None),
+            'notes': getattr(invoice, 'notes', ''),
+            'items': []  # À implémenter si nécessaire
+        })
+    
+    return Response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def user_invoices_list(request):
     """Liste des factures de l'utilisateur connecté"""
     invoices = Invoice.objects.filter(customer=request.user).order_by('-issue_date')

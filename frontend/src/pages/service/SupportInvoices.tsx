@@ -80,7 +80,34 @@ const SupportInvoices = () => {
   const loadInvoices = async () => {
     setLoading(true);
     try {
-      // Simuler des données pour le moment
+      // Charger les vraies factures depuis l'API
+      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/payments/admin/invoices/`);
+      if (response.ok) {
+        const data = await response.json();
+        // Adapter le format si nécessaire
+        const adaptedInvoices = data.map((inv: any) => ({
+          id: inv.id,
+          invoice_number: inv.invoice_number || `CT-${String(inv.id).padStart(5, '0')}`,
+          user: {
+            id: inv.user?.id || 0,
+            name: inv.user?.name || inv.user?.username || 'Utilisateur',
+            email: inv.user?.email || ''
+          },
+          total_amount: parseFloat(inv.total_amount || inv.amount || 0),
+          currency: inv.currency || 'EUR',
+          status: inv.status || 'draft',
+          created_at: inv.created_at,
+          due_date: inv.due_date,
+          paid_at: inv.paid_at,
+          payment_method: inv.payment_method,
+          items: inv.items || [],
+          notes: inv.notes
+        }));
+        setInvoices(adaptedInvoices);
+        return;
+      }
+      
+      // Si l'API échoue, utiliser des données de démonstration
       const mockInvoices: Invoice[] = [
         {
           id: 1,

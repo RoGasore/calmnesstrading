@@ -10,6 +10,7 @@ urlpatterns = [
     
     # URLs API
     path('api/validate-transaction/', views_invoice.validate_transaction_reference, name='validate_transaction_reference'),
+    path('api/admin/invoices/', views_invoice.admin_invoices_list_api, name='admin_invoices_list_api'),
     path('api/user/invoices/', views_invoice.user_invoices_list, name='user_invoices_list'),
     path('api/user/invoices/<int:invoice_id>/', views_invoice.user_invoice_detail, name='user_invoice_detail'),
     path('api/user/invoices/<int:invoice_id>/pdf/', views_invoice.user_invoice_pdf, name='user_invoice_pdf'),
