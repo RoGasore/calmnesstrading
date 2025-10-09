@@ -35,7 +35,7 @@ class PendingPaymentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PendingPayment
         fields = [
-            'offer', 'contact_method', 'contact_info', 'amount', 'currency'
+            'offer', 'contact_method', 'contact_info', 'amount', 'currency', 'user_info'
         ]
     
     def create(self, validated_data):
@@ -66,7 +66,7 @@ class PendingPaymentSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'user', 'user_id', 'user_email', 'user_username', 'user_first_name', 'user_last_name',
             'offer', 'offer_name', 'offer_type', 'contact_method', 'contact_method_display',
-            'contact_info', 'amount', 'currency', 'status', 'status_display',
+            'contact_info', 'amount', 'currency', 'user_info', 'transaction_id', 'status', 'status_display',
             'created_at', 'updated_at', 'admin_notes', 'validated_by', 'validated_by_email', 'validated_at'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'validated_by', 'validated_at']
