@@ -64,14 +64,14 @@ def validate_pending_payment(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     pending_payment_id = serializer.validated_data['pending_payment_id']
-    transaction_id = serializer.validated_data.get('transaction_id', '')
+    transaction_id = serializer.validated_data.get('transaction_id', '') or pending_payment.transaction_id
     admin_notes = serializer.validated_data.get('admin_notes', '')
     
     try:
         pending_payment = PendingPayment.objects.select_related('user', 'offer').get(id=pending_payment_id)
         
-        # Vérifier que le paiement est en attente
-        if pending_payment.status != 'pending':
+        # Vérifier que le paiement est en attente ou transaction soumise
+        if pending_payment.status not in ['pending', 'transaction_submitted', 'contacted']:
             return Response(
                 {'error': 'Ce paiement a déjà été traité'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -93,6 +93,7 @@ def validate_pending_payment(request):
         
         # Mettre à jour le paiement en attente
         pending_payment.status = 'confirmed'
+        pending_payment.transaction_id = transaction_id
         pending_payment.validated_by = request.user
         pending_payment.validated_at = timezone.now()
         pending_payment.admin_notes = admin_notes
@@ -122,9 +123,51 @@ def validate_pending_payment(request):
             created_by=request.user
         )
         
+        # Générer et envoyer la facture automatiquement
+        try:
+            from .models_invoice import Invoice, InvoiceItem
+            from .utils import send_invoice_email, send_invoice_telegram
+            
+            # Créer la facture
+            invoice = Invoice.objects.create(
+                user=pending_payment.user,
+                total_amount=pending_payment.amount,
+                currency=pending_payment.currency,
+                transaction_id=transaction_id,
+                status='paid',
+                created_by=request.user
+            )
+            
+            # Créer l'article de facture
+            InvoiceItem.objects.create(
+                invoice=invoice,
+                description=f"{pending_payment.offer.name} - {pending_payment.offer.description}",
+                quantity=1,
+                unit_price=pending_payment.amount,
+                total_price=pending_payment.amount
+            )
+            
+            # Lier la facture au paiement
+            payment.invoice = invoice
+            payment.save()
+            
+            # Envoyer la facture par email
+            user_email = pending_payment.user_info.get('email') or pending_payment.user.email
+            if user_email:
+                send_invoice_email(invoice, user_email)
+            
+            # Envoyer par Telegram si disponible
+            telegram_username = pending_payment.user_info.get('telegram_username')
+            if telegram_username:
+                send_invoice_telegram(invoice, telegram_username)
+                
+        except Exception as e:
+            # Ne pas bloquer si l'envoi échoue, juste logger
+            print(f"Erreur envoi facture: {e}")
+        
         # Préparer la réponse
         response_data = {
-            'message': 'Paiement validé avec succès',
+            'message': 'Paiement validé avec succès. Facture envoyée au client.',
             'payment': PaymentSerializer(payment).data,
             'pending_payment': PendingPaymentSerializer(pending_payment).data
         }
