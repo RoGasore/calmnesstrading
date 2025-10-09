@@ -136,13 +136,18 @@ const CheckoutNew = () => {
 
     try {
       // Créer le paiement en attente
-      const response = await fetchWithAuth('/api/payments/create/', {
+      const response = await fetchWithAuth('/api/payments/pending-payments/create/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           offer: selectedOffer?.id,
           user_info: userInfo,
-          status: 'pending'
+          amount: selectedOffer?.price || 0,
+          currency: selectedOffer?.currency || 'EUR',
+          contact_method: userInfo.telegram_username ? 'telegram' : 
+                         userInfo.whatsapp_number ? 'whatsapp' : 
+                         userInfo.discord_username ? 'discord' : 'email',
+          contact_info: userInfo.telegram_username || userInfo.whatsapp_number || userInfo.discord_username || userInfo.email
         })
       });
 
