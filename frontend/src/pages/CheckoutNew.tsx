@@ -263,13 +263,13 @@ const CheckoutNew = () => {
       
       <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
         {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between max-w-3xl mx-auto">
+        <div className="mb-8 overflow-x-auto">
+          <div className="flex items-center justify-between max-w-3xl mx-auto min-w-[280px]">
             {[
-              { step: 'verify-info', label: 'Vérification', icon: UserCheck },
-              { step: 'payment-pending', label: 'En attente', icon: Clock },
-              { step: 'enter-transaction', label: 'Transaction', icon: CreditCard },
-              { step: 'success', label: 'Confirmé', icon: CheckCircle }
+              { step: 'verify-info', label: 'Vérification', shortLabel: 'Info', icon: UserCheck },
+              { step: 'payment-pending', label: 'En attente', shortLabel: 'Attente', icon: Clock },
+              { step: 'enter-transaction', label: 'Transaction', shortLabel: 'ID', icon: CreditCard },
+              { step: 'success', label: 'Confirmé', shortLabel: 'OK', icon: CheckCircle }
             ].map((item, index) => {
               const isActive = currentStep === item.step;
               const isCompleted = ['verify-info', 'payment-pending', 'enter-transaction', 'success'].indexOf(currentStep) > index;
@@ -278,19 +278,20 @@ const CheckoutNew = () => {
                 <div key={item.step} className="flex items-center flex-1">
                   <div className="flex flex-col items-center flex-1">
                     <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all
+                      w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all
                       ${isCompleted ? 'bg-green-500 text-white' : 
                         isActive ? 'bg-[#D4AF37] text-black' : 
                         'bg-muted text-muted-foreground'}
                     `}>
-                      {isCompleted ? <CheckCircle className="h-5 w-5" /> : <item.icon className="h-5 w-5" />}
+                      {isCompleted ? <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" /> : <item.icon className="h-4 w-4 sm:h-5 sm:w-5" />}
                     </div>
-                    <p className={`text-xs mt-2 font-medium ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      {item.label}
+                    <p className={`text-[10px] sm:text-xs mt-1 sm:mt-2 font-medium text-center ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      <span className="hidden sm:inline">{item.label}</span>
+                      <span className="sm:hidden">{item.shortLabel}</span>
                     </p>
                   </div>
                   {index < 3 && (
-                    <div className={`h-0.5 flex-1 transition-all ${isCompleted ? 'bg-green-500' : 'bg-muted'}`} />
+                    <div className={`h-0.5 flex-1 min-w-[10px] sm:min-w-[20px] transition-all ${isCompleted ? 'bg-green-500' : 'bg-muted'}`} />
                   )}
                 </div>
               );
@@ -334,8 +335,8 @@ const CheckoutNew = () => {
 
                   {/* Formulaire */}
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="col-span-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2">
                         <Label htmlFor="full_name">Nom complet *</Label>
                         <Input
                           id="full_name"
@@ -346,7 +347,7 @@ const CheckoutNew = () => {
                         />
                       </div>
 
-                      <div className="col-span-2">
+                      <div className="sm:col-span-2">
                         <Label htmlFor="email">Email *</Label>
                         <Input
                           id="email"
@@ -358,7 +359,7 @@ const CheckoutNew = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="sm:col-span-1">
                         <Label htmlFor="phone">Téléphone</Label>
                         <Input
                           id="phone"
@@ -369,7 +370,7 @@ const CheckoutNew = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="sm:col-span-1">
                         <Label htmlFor="telegram">Telegram * (recommandé)</Label>
                         <Input
                           id="telegram"
@@ -379,7 +380,7 @@ const CheckoutNew = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="sm:col-span-1">
                         <Label htmlFor="whatsapp">WhatsApp</Label>
                         <Input
                           id="whatsapp"
@@ -390,7 +391,7 @@ const CheckoutNew = () => {
                         />
                       </div>
 
-                      <div>
+                      <div className="sm:col-span-1">
                         <Label htmlFor="discord">Discord</Label>
                         <Input
                           id="discord"
@@ -653,13 +654,14 @@ const CheckoutNew = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 justify-center">
-                    <Button onClick={() => navigate('/user')} variant="outline">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button onClick={() => navigate('/user')} variant="outline" className="w-full sm:w-auto">
                       Retour au dashboard
                     </Button>
                     <Button 
                       onClick={() => navigate('/user/payments')}
                       style={{ backgroundColor: '#D4AF37', color: '#000000' }}
+                      className="w-full sm:w-auto"
                     >
                       Voir mes paiements
                     </Button>
