@@ -31,6 +31,10 @@ python manage.py init_production_cms
 echo "👤 Synchronisation de l'utilisateur admin..."
 python manage.py sync_admin_user
 
+# Créer l'utilisateur service client (essentiel pour la gestion des paiements)
+echo "🛟 Création de l'utilisateur service client..."
+python manage.py create_customer_service
+
 # Créer l'utilisateur de test (pour le développement)
 echo "👥 Création de l'utilisateur de test..."
 python manage.py create_test_user
