@@ -33,6 +33,8 @@ import {
 } from "lucide-react";
 import { usePayment } from "@/contexts/PaymentContext";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { API_CONFIG } from "@/config/api";
 
 interface PendingPayment {
   id: number;
@@ -57,7 +59,10 @@ interface PendingPayment {
 const AdminPayments = () => {
   const { adminDashboard, fetchAdminDashboard, validatePendingPayment, cancelPendingPayment, loading } = usePayment();
   const { toast } = useToast();
+  const { fetchWithAuth } = useAuth();
 
+  const [allPendingPayments, setAllPendingPayments] = useState<PendingPayment[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState<PendingPayment | null>(null);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [validateDialogOpen, setValidateDialogOpen] = useState(false);
@@ -66,7 +71,24 @@ const AdminPayments = () => {
 
   useEffect(() => {
     fetchAdminDashboard();
+    loadAllPendingPayments();
   }, [fetchAdminDashboard]);
+
+  const loadAllPendingPayments = async () => {
+    setLoadingPayments(true);
+    try {
+      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/payments/admin/pending-payments/`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('All pending payments loaded:', data);
+        setAllPendingPayments(data);
+      }
+    } catch (error) {
+      console.error('Error loading pending payments:', error);
+    } finally {
+      setLoadingPayments(false);
+    }
+  };
 
   const handleValidatePayment = async () => {
     if (!selectedPayment) return;
@@ -80,6 +102,7 @@ const AdminPayments = () => {
       setValidateDialogOpen(false);
       setAdminNotes("");
       fetchAdminDashboard();
+      loadAllPendingPayments();
     } catch (error) {
       toast({
         title: "Erreur",
@@ -101,6 +124,7 @@ const AdminPayments = () => {
       setCancelDialogOpen(false);
       setAdminNotes("");
       fetchAdminDashboard();
+      loadAllPendingPayments();
     } catch (error) {
       toast({
         title: "Erreur",
@@ -119,6 +143,11 @@ const AdminPayments = () => {
     switch (status) {
       case 'pending':
         return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-700 border-yellow-500"><Clock className="w-3 h-3 mr-1" />En attente</Badge>;
+      case 'transaction_submitted':
+        return <Badge variant="outline" className="bg-blue-500/10 text-blue-700 border-blue-500"><CheckCircle className="w-3 h-3 mr-1" />Transaction soumise</Badge>;
+      case 'contacted':
+        return <Badge variant="outline" className="bg-purple-500/10 text-purple-700 border-purple-500"><Users className="w-3 h-3 mr-1" />Contacté</Badge>;
+      case 'confirmed':
       case 'validated':
         return <Badge variant="outline" className="bg-green-500/10 text-green-700 border-green-500"><CheckCircle className="w-3 h-3 mr-1" />Validé</Badge>;
       case 'cancelled':
@@ -137,11 +166,11 @@ const AdminPayments = () => {
     }
   };
 
-  const pendingPayments = adminDashboard?.recent_pending_payments || [];
+  const pendingPayments = allPendingPayments;
   const stats = {
     total: pendingPayments.length,
-    pending: pendingPayments.filter((p: PendingPayment) => p.status === 'pending').length,
-    validated: pendingPayments.filter((p: PendingPayment) => p.status === 'validated').length,
+    pending: pendingPayments.filter((p: PendingPayment) => p.status === 'pending' || p.status === 'transaction_submitted').length,
+    validated: pendingPayments.filter((p: PendingPayment) => p.status === 'confirmed').length,
     totalAmount: pendingPayments.reduce((sum: number, p: PendingPayment) => sum + parseFloat(p.amount.toString()), 0)
   };
 
@@ -203,7 +232,7 @@ const AdminPayments = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {loading ? (
+            {loadingPayments ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
