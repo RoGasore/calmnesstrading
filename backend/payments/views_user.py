@@ -29,7 +29,9 @@ class CreatePendingPaymentView(generics.CreateAPIView):
     serializer_class = PendingPaymentCreateSerializer
     permission_classes = [IsAuthenticated]
     
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         pending_payment = serializer.save(user=self.request.user)
         
         # Créer une entrée dans l'historique
@@ -40,7 +42,9 @@ class CreatePendingPaymentView(generics.CreateAPIView):
             created_by=self.request.user
         )
         
-        return pending_payment
+        # Retourner l'objet complet avec l'ID
+        output_serializer = PendingPaymentSerializer(pending_payment)
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
 
 
 # ==================== PAIEMENTS ====================
