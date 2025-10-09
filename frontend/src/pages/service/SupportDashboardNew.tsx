@@ -1,67 +1,57 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePayment } from "@/contexts/PaymentContext";
 import { useToast } from "@/hooks/use-toast";
-import { API_CONFIG } from "@/config/api";
-import { WidgetContainer } from "@/components/admin/widgets/WidgetContainer";
-import { WidgetSettings } from "@/components/admin/widgets/WidgetSettings";
-import {
-  CreditCard,
-  Users,
-  DollarSign,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-  MessageSquare,
-  Package,
-  Target,
-  Loader2,
-  ArrowUpRight,
-  ArrowDownRight
-} from "lucide-react";
+import { SupportWidgetContainer } from "./SupportWidgetContainer";
+import { SupportWidgetSettings } from "./SupportWidgetSettings";
+import { SupportRecentActivity } from "./SupportRecentActivity";
+import { TrendingUp, Target, Loader2, Shield } from "lucide-react";
 
 const SupportDashboardNew = () => {
-  const { fetchWithAuth } = useAuth();
   const { adminDashboard, fetchAdminDashboard, loading: paymentLoading } = usePayment();
+  const { fetchWithAuth } = useAuth();
   const { toast } = useToast();
   
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    pendingPayments: 0,
-    totalRevenue: 0,
-    totalClients: 0,
-    activeSubscriptions: 0,
-    unreadMessages: 0,
-    pendingOrders: 0,
-  });
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [statsData, setStatsData] = useState<any>(null);
+  const [activityData, setActivityData] = useState<any>(null);
 
-  const loadDashboardData = useCallback(async () => {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+  
+  // Refs pour éviter les dépendances instables
+  const fetchWithAuthRef = useRef(fetchWithAuth);
+  const fetchAdminDashboardRef = useRef(fetchAdminDashboard);
+  const toastRef = useRef(toast);
+  
+  // Mettre à jour les refs
+  fetchWithAuthRef.current = fetchWithAuth;
+  fetchAdminDashboardRef.current = fetchAdminDashboard;
+  toastRef.current = toast;
+
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
-      await fetchAdminDashboard();
+      // Charger les données de paiements
+      await fetchAdminDashboardRef.current();
       
-      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/payments/admin/dashboard/`);
-      if (response.ok) {
-        const data = await response.json();
-        setStats({
-          pendingPayments: data.pending_payments_count || 0,
-          totalRevenue: data.total_revenue || 0,
-          totalClients: data.total_users || 0,
-          activeSubscriptions: data.active_subscriptions || 0,
-          unreadMessages: 0,
-          pendingOrders: 0,
-        });
-        setRecentActivity(data.recent_pending_payments || []);
+      // Charger les statistiques utilisateurs
+      const statsResponse = await fetchWithAuthRef.current(`${API_BASE}/api/auth/admin/overview/stats/`);
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setStatsData(statsData);
+      }
+      
+      // Charger les données d'activité
+      const activityResponse = await fetchWithAuthRef.current(`${API_BASE}/api/auth/admin/overview/activity/`);
+      if (activityResponse.ok) {
+        const activityData = await activityResponse.json();
+        setActivityData(activityData);
       }
     } catch (error) {
-      console.error('Error loading dashboard:', error);
-      toast({
+      toastRef.current({
         title: "Erreur",
         description: "Impossible de charger les données",
         variant: "destructive"
@@ -69,289 +59,203 @@ const SupportDashboardNew = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchAdminDashboard, fetchWithAuth, toast]);
+  }, [API_BASE]); // Seulement API_BASE comme dépendance
 
   useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+    fetchAllData();
+  }, []); // Se déclenche une seule fois au montage
 
-  // Calculer les objectifs
-  const goals = useMemo(() => ({
-    payments: {
-      current: stats.pendingPayments,
-      target: 10,
-      percentage: Math.min((stats.pendingPayments / 10) * 100, 100)
-    },
-    revenue: {
-      current: stats.totalRevenue,
-      target: 5000,
-      percentage: Math.min((stats.totalRevenue / 5000) * 100, 100)
-    },
-    clients: {
-      current: stats.totalClients,
-      target: 100,
-      percentage: Math.min((stats.totalClients / 100) * 100, 100)
+  // Calculer les objectifs basés sur les vraies données (mémorisé)
+  const goals = useMemo(() => {
+    if (!statsData || !adminDashboard) {
+      return {
+        users: { current: 0, target: 100, percentage: 0 },
+        revenue: { current: 0, target: 10000, percentage: 0 },
+        satisfaction: { current: 4.7, target: 5.0, percentage: 94 }
+      };
     }
-  }), [stats]);
+
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    // Utilisateurs ce mois
+    const newUsersThisMonth = statsData.users.new_this_week * 4; // Approximation
+    const userGoal = 50; // Objectif mensuel
+    const userPercentage = Math.min((newUsersThisMonth / userGoal) * 100, 100);
+    
+    // Revenus ce mois
+    const currentMonthRevenue = adminDashboard.payment_history
+      ?.filter((p: any) => {
+        const date = new Date(p.created_at);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      })
+      ?.reduce((sum: number, p: any) => sum + parseFloat(p.amount), 0) || 0;
+    
+    const revenueGoal = 5000; // Objectif mensuel
+    const revenuePercentage = Math.min((currentMonthRevenue / revenueGoal) * 100, 100);
+
+    return {
+      users: { 
+        current: newUsersThisMonth, 
+        target: userGoal, 
+        percentage: userPercentage 
+      },
+      revenue: { 
+        current: currentMonthRevenue, 
+        target: revenueGoal, 
+        percentage: revenuePercentage 
+      },
+      satisfaction: { 
+        current: 4.7, 
+        target: 5.0, 
+        percentage: 94 
+      }
+    };
+  }, [statsData, adminDashboard]);
+
+  // Calculer les métriques de performance (mémorisé)
+  const performance = useMemo(() => {
+    if (!adminDashboard) {
+      return {
+        retention: 0,
+        responseTime: 0,
+        conversion: 0,
+        support: 0
+      };
+    }
+
+    const totalUsers = statsData?.users?.total || 1;
+    const activeUsers = statsData?.users?.active || 0;
+    const totalPayments = adminDashboard.payment_history?.length || 0;
+    const pendingPayments = adminDashboard.pending_payments_count || 0;
+
+    return {
+      retention: Math.round((activeUsers / totalUsers) * 100),
+      responseTime: 2.3, // Temps de réponse moyen
+      conversion: Math.round((totalPayments / totalUsers) * 100),
+      support: Math.round(((totalPayments - pendingPayments) / Math.max(totalPayments, 1)) * 100)
+    };
+  }, [adminDashboard, statsData]);
+
+  const handleWidgetReset = () => {
+    // Le reset sera géré par SupportWidgetContainer lui-même
+  };
+
+  if (loading || paymentLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, index) => (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="-ml-2" />
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Dashboard Support</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Gestion des opérations et support client
-            </p>
-          </div>
+    <div className="space-y-6">
+      {/* Bouton Support Panel fixe pour mobile */}
+      <div className="fixed left-4 top-24 z-50 md:hidden">
+        <SidebarTrigger className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full p-3 shadow-lg">
+          <Shield className="h-5 w-5" />
+        </SidebarTrigger>
+      </div>
+      
+      {/* Widgets personnalisables */}
+      <SupportWidgetContainer statsData={statsData} adminDashboard={adminDashboard} />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <SupportRecentActivity activityData={activityData} />
         </div>
         
-        <WidgetSettings storageKey="support_widgets" />
-      </div>
+        <div className="space-y-6">
+          {/* Paramètres des widgets */}
+          <SupportWidgetSettings onReset={handleWidgetReset} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Objectifs Mensuels
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Nouveaux clients</span>
+                  <span>{goals.users.percentage.toFixed(0)}%</span>
+                </div>
+                <Progress value={goals.users.percentage} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {goals.users.current.toFixed(0)}/{goals.users.target} objectif
+                </p>
+              </div>
+              
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Revenus</span>
+                  <span>{goals.revenue.percentage.toFixed(0)}%</span>
+                </div>
+                <Progress value={goals.revenue.percentage} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  €{goals.revenue.current.toFixed(0)}/{goals.revenue.target} objectif
+                </p>
+              </div>
+              
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Satisfaction client</span>
+                  <span>{goals.satisfaction.percentage}%</span>
+                </div>
+                <Progress value={goals.satisfaction.percentage} className="h-2" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {goals.satisfaction.current}/5.0 étoiles
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Widgets personnalisables */}
-      <WidgetContainer
-        storageKey="support_widgets"
-        availableWidgets={[
-          {
-            id: 'payments',
-            title: 'Paiements en attente',
-            component: (
-              <Card className="border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Paiements en attente</CardTitle>
-                  <div className="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
-                    <Clock className="h-5 w-5 text-yellow-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{stats.pendingPayments}</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 border-yellow-300">
-                      Urgent
-                    </Badge>
-                    <p className="text-xs text-muted-foreground">
-                      Nécessite attention
-                    </p>
-                  </div>
-                  <Progress value={goals.payments.percentage} className="mt-3 h-2" />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {goals.payments.current}/{goals.payments.target} objectif
-                  </p>
-                  <Button 
-                    className="mt-3 w-full" 
-                    size="sm"
-                    style={{ backgroundColor: '#D4AF37', color: '#000000' }}
-                    onClick={() => window.location.href = '/support/payments'}
-                  >
-                    Gérer maintenant
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'revenue',
-            title: 'Revenus Total',
-            component: (
-              <Card className="border-l-4 border-green-500">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Revenus Total</CardTitle>
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold" style={{ color: '#D4AF37' }}>
-                    {stats.totalRevenue.toFixed(2)} €
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    +12% ce mois
-                  </p>
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'clients',
-            title: 'Clients Total',
-            component: (
-              <Card className="border-l-4 border-blue-500">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Clients Total</CardTitle>
-                  <Users className="h-5 w-5 text-blue-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalClients}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Utilisateurs actifs
-                  </p>
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'subscriptions',
-            title: 'Abonnements Actifs',
-            component: (
-              <Card className="border-l-4 border-purple-500">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Abonnements Actifs</CardTitle>
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.activeSubscriptions}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Renouvellements à venir
-                  </p>
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'messages',
-            title: 'Messages Non Lus',
-            component: (
-              <Card className="border-l-4 border-orange-500">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Messages Non Lus</CardTitle>
-                  <MessageSquare className="h-5 w-5 text-orange-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.unreadMessages}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    En attente de réponse
-                  </p>
-                  <Button 
-                    className="mt-3 w-full" 
-                    size="sm"
-                    variant="outline"
-                    onClick={() => window.location.href = '/support/messages'}
-                  >
-                    Voir les messages
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'orders',
-            title: 'Commandes en attente',
-            component: (
-              <Card className="border-l-4 border-indigo-500">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Commandes en attente</CardTitle>
-                  <Package className="h-5 w-5 text-indigo-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.pendingOrders}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    À traiter
-                  </p>
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'recent-payments',
-            title: 'Paiements Récents',
-            component: (
-              <Card className="col-span-full">
-                <CardHeader>
-                  <CardTitle>Paiements Récents</CardTitle>
-                  <CardDescription>
-                    Les derniers paiements en attente de validation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {loading ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      Chargement...
-                    </div>
-                  ) : recentActivity.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      Aucun paiement en attente
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {recentActivity.slice(0, 5).map((payment: any) => (
-                        <div
-                          key={payment.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                              <CreditCard className="h-5 w-5" style={{ color: '#D4AF37' }} />
-                            </div>
-                            <div>
-                              <p className="font-medium">{payment.user?.name || 'Utilisateur'}</p>
-                              <p className="text-sm text-muted-foreground">{payment.offer?.name}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-bold" style={{ color: '#D4AF37' }}>
-                              {payment.amount} {payment.currency}
-                            </p>
-                            <Badge variant="outline" className="mt-1">
-                              {payment.status === 'transaction_submitted' ? 'À vérifier' : 'En attente'}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          },
-          {
-            id: 'quick-actions',
-            title: 'Actions Rapides',
-            component: (
-              <Card className="col-span-full">
-                <CardHeader>
-                  <CardTitle>Actions Rapides</CardTitle>
-                  <CardDescription>
-                    Accès rapide aux fonctionnalités principales
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <a
-                      href="/support/payments"
-                      className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center group"
-                    >
-                      <CreditCard className="h-8 w-8 group-hover:scale-110 transition-transform" style={{ color: '#D4AF37' }} />
-                      <span className="font-medium">Gérer Paiements</span>
-                    </a>
-                    <a
-                      href="/support/messages"
-                      className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center group"
-                    >
-                      <MessageSquare className="h-8 w-8 group-hover:scale-110 transition-transform" style={{ color: '#D4AF37' }} />
-                      <span className="font-medium">Messages</span>
-                    </a>
-                    <a
-                      href="/support/clients"
-                      className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center group"
-                    >
-                      <Users className="h-8 w-8 group-hover:scale-110 transition-transform" style={{ color: '#D4AF37' }} />
-                      <span className="font-medium">Clients</span>
-                    </a>
-                    <a
-                      href="/support/invoices"
-                      className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center group"
-                    >
-                      <CheckCircle className="h-8 w-8 group-hover:scale-110 transition-transform" style={{ color: '#D4AF37' }} />
-                      <span className="font-medium">Factures</span>
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          }
-        ]}
-      />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Performance Support
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Taux de rétention</span>
+                <span className="font-semibold text-green-600">{performance.retention}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Temps de réponse</span>
+                <span className="font-semibold text-blue-600">{performance.responseTime}s</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Taux de conversion</span>
+                <span className="font-semibold text-purple-600">{performance.conversion}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm">Satisfaction support</span>
+                <span className="font-semibold text-green-600">{performance.support}%</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
