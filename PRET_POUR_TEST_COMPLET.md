@@ -19,9 +19,9 @@ TELEGRAM_BOT_USERNAME=VotreBotUsername
 TELEGRAM_CHANNEL_ID=-1001234567890
 TELEGRAM_CHANNEL_NAME=Calmness Trading Signals
 
-# Redis (DÉJÀ CONFIGURÉ)
-UPSTASH_REDIS_REST_URL=https://legible-goblin-35329.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AYoBAAIncDFjOTI0NjQ2OThhOWM0MGVlOTcwNzViNTExNWJhYjBmMXAxMzUzMjk
+# Redis (Vos vraies valeurs depuis Upstash)
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
 ```
 
 ### 2️⃣ Lancer TOUS les Services

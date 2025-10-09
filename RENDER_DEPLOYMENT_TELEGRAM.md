@@ -82,8 +82,8 @@ TELEGRAM_CHANNEL_ID=-1001234567890
 TELEGRAM_CHANNEL_NAME=Calmness Trading Signals
 
 # Redis Upstash
-UPSTASH_REDIS_REST_URL=https://legible-goblin-35329.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AYoBAAIncDFjOTI0NjQ2OThhOWM0MGVlOTcwNzViNTExNWJhYjBmMXAxMzUzMjk
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
 
 # Email
 EMAIL_HOST_USER=votre-email@gmail.com
@@ -194,8 +194,8 @@ python telegram_bot/bot.py
 Vous utilisez déjà Upstash Redis :
 
 ```env
-UPSTASH_REDIS_REST_URL=https://legible-goblin-35329.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AYoBAAIncDFjOTI0NjQ2OThhOWM0MGVlOTcwNzViNTExNWJhYjBmMXAxMzUzMjk
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
 ```
 
 ✅ **Aucune action requise** - Le système est déjà configuré pour l'utiliser !

@@ -19,8 +19,8 @@ TELEGRAM_CHANNEL_NAME=Calmness Trading Signals
 
 **Les 2 Redis sont DÉJÀ là :**
 ```env
-UPSTASH_REDIS_REST_URL=https://legible-goblin-35329.upstash.io
-UPSTASH_REDIS_REST_TOKEN=AYoBAAInc...
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
 ```
 
 ---
