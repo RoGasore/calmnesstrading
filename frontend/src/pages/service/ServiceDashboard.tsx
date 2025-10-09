@@ -188,28 +188,28 @@ const ServiceDashboard = () => {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <a
-              href="/service/payments"
+              href="/support/payments"
               className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center"
             >
               <CreditCard className="h-8 w-8" style={{ color: '#D4AF37' }} />
               <span className="font-medium">Gérer Paiements</span>
             </a>
             <a
-              href="/service/messages"
+              href="/support/messages"
               className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center"
             >
               <MessageSquare className="h-8 w-8" style={{ color: '#D4AF37' }} />
               <span className="font-medium">Messages</span>
             </a>
             <a
-              href="/service/clients"
+              href="/support/clients"
               className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center"
             >
               <Users className="h-8 w-8" style={{ color: '#D4AF37' }} />
               <span className="font-medium">Clients</span>
             </a>
             <a
-              href="/service/invoices"
+              href="/support/invoices"
               className="flex flex-col items-center gap-2 p-4 border rounded-lg hover:bg-muted/50 transition-colors text-center"
             >
               <CheckCircle className="h-8 w-8" style={{ color: '#D4AF37' }} />

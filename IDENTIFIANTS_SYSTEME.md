@@ -29,7 +29,7 @@ Ce document contient tous les identifiants d'accès pour les différents rôles 
 ## 👥 SERVICE CLIENT
 
 ### Accès
-- **URL** : https://calmnesstrading.vercel.app/service
+- **URL** : https://calmnesstrading.vercel.app/support
 - **Email** : service@calmnessfi.com
 - **Mot de passe** : ServiceClient2024!
 
@@ -46,39 +46,39 @@ Ce document contient tous les identifiants d'accès pour les différents rôles 
 - ❌ Gestion des formations (réservé à l'admin)
 
 ### Fonctionnalités Principales
-1. **Dashboard Service Client** (`/service`)
+1. **Dashboard Service Client** (`/support`)
    - Statistiques en temps réel
    - Paiements en attente
    - Messages non lus
    - Actions rapides
 
-2. **Gestion des Paiements** (`/service/payments`)
+2. **Gestion des Paiements** (`/support/payments`)
    - Validation des paiements en attente
    - Vérification des transactions
    - Génération automatique de factures
    - Envoi email/Telegram
 
-3. **Messagerie** (`/service/messages`)
+3. **Messagerie** (`/support/messages`)
    - Communication directe avec clients
    - Support multi-canal
    - Historique des conversations
 
-4. **Gestion Clients** (`/service/clients`)
+4. **Gestion Clients** (`/support/clients`)
    - Liste des clients
    - Profils détaillés
    - Historique d'achat
 
-5. **Revenus** (`/service/revenues`)
+5. **Revenus** (`/support/revenues`)
    - Suivi des revenus
    - Statistiques financières
    - Rapports mensuels
 
-6. **Commandes** (`/service/orders`)
+6. **Commandes** (`/support/orders`)
    - Validation des commandes
    - Suivi des livraisons
    - Gestion des retours
 
-7. **Factures** (`/service/invoices`)
+7. **Factures** (`/support/invoices`)
    - Génération de factures PDF
    - Envoi automatique
    - Numérotation CT-XXXXX

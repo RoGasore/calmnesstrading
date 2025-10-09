@@ -18,7 +18,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/Admin";
-import Service from "./pages/Service";
+import Support from "./pages/Service";
 import User from "./pages/User";
 import Formation from "./pages/Formation";
 import CourseContent from "./pages/CourseContent";
@@ -40,7 +40,7 @@ const queryClient = new QueryClient();
 function AppContent() {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
-  const isServicePage = location.pathname.startsWith('/service');
+  const isSupportPage = location.pathname.startsWith('/support');
   
   return (
     <>
@@ -61,7 +61,7 @@ function AppContent() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/admin/*" element={<Admin />} />
-        <Route path="/service/*" element={<Service />} />
+        <Route path="/support/*" element={<Support />} />
         <Route path="/user/*" element={<User />} />
         {/* Services Routes */}
         <Route path="/services" element={<Services />} />
@@ -71,8 +71,8 @@ function AppContent() {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {/* Support Widget - affiché sur toutes les pages sauf admin et service */}
-      {!isAdminPage && !isServicePage && <SupportWidget />}
+      {/* Support Widget - affiché sur toutes les pages sauf admin et support staff */}
+      {!isAdminPage && !isSupportPage && <SupportWidget />}
     </>
   );
 }

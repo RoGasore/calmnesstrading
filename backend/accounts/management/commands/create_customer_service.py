@@ -61,7 +61,7 @@ class Command(BaseCommand):
             self.style.SUCCESS(f'👤 Rôle    : Service Client')
         )
         self.stdout.write(
-            self.style.SUCCESS(f'🔗 URL     : https://calmnesstrading.vercel.app/service')
+            self.style.SUCCESS(f'🔗 URL     : https://calmnesstrading.vercel.app/support')
         )
         self.stdout.write(
             self.style.SUCCESS('\n' + '='*60 + '\n')

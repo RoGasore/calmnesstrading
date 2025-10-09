@@ -18,38 +18,38 @@ const ServiceSidebar = () => {
 
   const navItems = [
     {
-      to: "/service",
+      to: "/support",
       icon: LayoutDashboard,
       label: "Dashboard",
       end: true,
     },
     {
-      to: "/service/payments",
+      to: "/support/payments",
       icon: CreditCard,
       label: "Paiements",
     },
     {
-      to: "/service/messages",
+      to: "/support/messages",
       icon: MessageSquare,
       label: "Messages",
     },
     {
-      to: "/service/clients",
+      to: "/support/clients",
       icon: Users,
       label: "Clients",
     },
     {
-      to: "/service/revenues",
+      to: "/support/revenues",
       icon: DollarSign,
       label: "Revenus",
     },
     {
-      to: "/service/orders",
+      to: "/support/orders",
       icon: Package,
       label: "Commandes",
     },
     {
-      to: "/service/invoices",
+      to: "/support/invoices",
       icon: FileText,
       label: "Factures",
     },

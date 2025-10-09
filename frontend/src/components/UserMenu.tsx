@@ -18,7 +18,7 @@ const UserMenu = () => {
     if (isAdmin()) {
       navigate("/admin");
     } else if (user.is_customer_service) {
-      navigate("/service");
+      navigate("/support");
     } else {
       navigate("/user");
     }

@@ -59,7 +59,7 @@
 | Gestion formations | ❌ Non |
 
 #### Interface
-- URL : `/service`
+- URL : `/support`
 - Dashboard : Opérations quotidiennes
 - Sections :
   - Dashboard
@@ -147,7 +147,7 @@
 ### Étape 2 : Service Client
 ```
 1. Reçoit notification nouveau paiement
-2. Ouvre le paiement dans /service/payments
+2. Ouvre le paiement dans /support/payments
 3. Clique "Vérifier & Valider" (bouton gold)
 4. Dialog professionnel s'ouvre :
    ┌─────────────────────────────────────────┐
@@ -261,13 +261,13 @@ def admin_dashboard(request):
 ```typescript
 // App.tsx
 <Route path="/admin/*" element={<Admin />} />
-<Route path="/service/*" element={<Service />} />
+<Route path="/support/*" element={<Support />} />
 <Route path="/user/*" element={<User />} />
 
 // UserMenu.tsx
 const handleClick = () => {
   if (isAdmin()) navigate("/admin");
-  else if (user.is_customer_service) navigate("/service");
+  else if (user.is_customer_service) navigate("/support");
   else navigate("/user");
 };
 ```
@@ -303,7 +303,7 @@ Utilisateur clique sur widget support
   ↓
 Choisit canal (Chat, WhatsApp, Telegram, etc.)
   ↓
-Service Client reçoit message dans /service/messages
+Service Client reçoit message dans /support/messages
   ↓
 Répond via messagerie intégrée
   ↓
@@ -377,7 +377,7 @@ python manage.py create_test_user  # Test
 ### Frontend (Vercel)
 - Routes automatiquement déployées
 - `/admin` → Admin
-- `/service` → Service Client
+- `/support` → Service Client
 - `/user` → Utilisateur
 
 ---

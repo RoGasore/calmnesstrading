@@ -40,7 +40,7 @@ const ServiceInvoices = () => (
   </div>
 );
 
-const Service = () => {
+const Support = () => {
   const { user } = useAuth();
 
   // Vérifier si l'utilisateur est service client ou admin
@@ -63,5 +63,5 @@ const Service = () => {
   );
 };
 
-export default Service;
+export default Support;
 
