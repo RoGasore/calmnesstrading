@@ -14,9 +14,11 @@ const UserMenu = () => {
   const avatarInitial = (displayName && displayName.charAt(0)) || "?";
 
   const handleClick = () => {
-    // Rediriger vers /admin si admin, sinon vers /user
+    // Rediriger selon le rôle : admin, service client, ou utilisateur
     if (isAdmin()) {
       navigate("/admin");
+    } else if (user.is_customer_service) {
+      navigate("/service");
     } else {
       navigate("/user");
     }
@@ -27,7 +29,11 @@ const UserMenu = () => {
       variant="ghost" 
       className="relative h-10 w-10 rounded-full hover:ring-2 hover:ring-primary transition-all" 
       onClick={handleClick}
-      title={isAdmin() ? "Aller au Panel Admin" : "Aller à Mon Espace"}
+      title={
+        isAdmin() ? "Aller au Panel Admin" : 
+        user.is_customer_service ? "Aller au Service Client" : 
+        "Aller à Mon Espace"
+      }
     >
       <Avatar className="h-10 w-10">
         <AvatarImage src={(user as any).avatar} alt={avatarAlt} />

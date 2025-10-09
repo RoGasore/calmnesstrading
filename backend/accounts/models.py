@@ -5,8 +5,24 @@ import uuid
 
 class User(AbstractUser):
     """Modèle utilisateur personnalisé avec champs supplémentaires"""
+    
+    # Rôles utilisateur
+    ROLE_CHOICES = [
+        ('user', 'Utilisateur'),
+        ('customer_service', 'Service Client'),
+        ('admin', 'Administrateur'),
+    ]
+    
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    
+    # Rôle
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default='user',
+        help_text="Rôle de l'utilisateur dans le système"
+    )
     
     # Comptes de contact (obligatoires pour les paiements)
     telegram_username = models.CharField(
@@ -66,6 +82,20 @@ class User(AbstractUser):
         """Met à jour la permission de paiement basée sur le profil"""
         self.can_make_payment = self.has_complete_profile()
         self.save(update_fields=['can_make_payment'])
+    
+    @property
+    def is_customer_service(self):
+        """Vérifie si l'utilisateur est service client"""
+        return self.role == 'customer_service' or self.is_staff
+    
+    @property
+    def is_admin_user(self):
+        """Vérifie si l'utilisateur est admin"""
+        return self.role == 'admin' or self.is_superuser
+    
+    def can_manage_payments(self):
+        """Vérifie si l'utilisateur peut gérer les paiements"""
+        return self.role in ['customer_service', 'admin'] or self.is_staff
 
 class UserProfile(models.Model):
     """Profil étendu de l'utilisateur"""

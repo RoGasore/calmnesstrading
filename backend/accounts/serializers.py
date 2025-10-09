@@ -59,13 +59,16 @@ class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
     is_verified = serializers.ReadOnlyField()
     profile_complete = serializers.SerializerMethodField()
+    is_customer_service = serializers.ReadOnlyField()
+    is_admin_user = serializers.ReadOnlyField()
     
     class Meta:
         model = User
         fields = [
             "id", "username", "email", "first_name", "last_name", "full_name", 
             "phone", "telegram_username", "discord_username", "whatsapp_number",
-            "is_staff", "is_verified", "can_make_payment", "profile_complete", "created_at"
+            "role", "is_staff", "is_verified", "can_make_payment", "profile_complete", 
+            "is_customer_service", "is_admin_user", "created_at"
         ]
     
     def get_profile_complete(self, obj):
@@ -84,13 +87,16 @@ class AdminUserSerializer(serializers.ModelSerializer):
     created_at = serializers.ReadOnlyField()
     last_login = serializers.ReadOnlyField()
     profile_complete = serializers.SerializerMethodField()
+    is_customer_service = serializers.ReadOnlyField()
+    is_admin_user = serializers.ReadOnlyField()
     
     class Meta:
         model = User
         fields = [
             "id", "username", "email", "first_name", "last_name", "full_name", 
             "phone", "telegram_username", "discord_username", "whatsapp_number",
-            "is_staff", "is_active", "is_verified", "can_make_payment", "profile_complete",
+            "role", "is_staff", "is_active", "is_verified", "can_make_payment", 
+            "profile_complete", "is_customer_service", "is_admin_user",
             "created_at", "last_login", "date_joined"
         ]
     

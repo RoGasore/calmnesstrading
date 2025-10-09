@@ -7,7 +7,10 @@ export interface User {
 	username: string;
 	first_name?: string;
 	last_name?: string;
+	role?: string;
 	is_staff?: boolean;
+	is_customer_service?: boolean;
+	is_admin_user?: boolean;
 	phone?: string;
 	telegram_username?: string;
 	is_verified?: boolean;
