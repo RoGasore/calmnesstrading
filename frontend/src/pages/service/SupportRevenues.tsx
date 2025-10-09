@@ -1,5 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { API_CONFIG } from "@/config/api";
 import {
   Table,
   TableBody,
@@ -23,16 +25,13 @@ import { motion } from "framer-motion";
 
 const SupportRevenues = () => {
   const { adminDashboard, fetchAdminDashboard, loading } = usePayment();
-
-  useEffect(() => {
-    fetchAdminDashboard();
-  }, [fetchAdminDashboard]);
-
+  const { fetchWithAuth } = useAuth();
   const [revenueData, setRevenueData] = useState<any>(null);
 
   useEffect(() => {
+    fetchAdminDashboard();
     loadRevenueData();
-  }, []);
+  }, [fetchAdminDashboard]);
 
   const loadRevenueData = async () => {
     try {
