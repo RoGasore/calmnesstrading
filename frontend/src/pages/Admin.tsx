@@ -37,16 +37,25 @@ const Admin = () => {
   const navigate = useNavigate();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Redirection si pas admin
+  // Redirection si pas admin (vérifier le rôle spécifique)
   useEffect(() => {
     // Attendre que l'utilisateur soit chargé avant de vérifier
     if (user !== null) {
       setIsCheckingAuth(false);
-      if (!isAdmin()) {
+      
+      // Si c'est un service client, rediriger vers /support
+      if (user.is_customer_service || user.role === 'customer_service') {
+        navigate("/support");
+        return;
+      }
+      
+      // Si ce n'est ni admin ni superuser, rediriger vers home
+      if (!user.is_admin_user && user.role !== 'admin' && !user.is_superuser) {
         navigate("/");
+        return;
       }
     }
-  }, [user, isAdmin, navigate]);
+  }, [user, navigate]);
 
   // Afficher un loader pendant la vérification d'authentification
   if (isCheckingAuth || user === null) {

@@ -1,6 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import ServiceLayout from "@/components/service/ServiceLayout";
-import ServiceDashboard from "./service/ServiceDashboard";
+import SupportDashboardNew from "./service/SupportDashboardNew";
 import AdminPayments from "./admin/AdminPayments"; // Réutiliser la page paiements admin
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -42,16 +43,45 @@ const ServiceInvoices = () => (
 
 const Support = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // Vérifier si l'utilisateur est service client ou admin
-  if (!user || (!user.is_customer_service && !user.is_staff)) {
-    return <Navigate to="/" replace />;
+  // Protection de route : uniquement service client
+  useEffect(() => {
+    if (user !== null) {
+      // Si c'est un admin (pas service client), rediriger vers /admin
+      if (user.is_admin_user || user.role === 'admin') {
+        navigate("/admin");
+        return;
+      }
+      
+      // Si ce n'est pas service client, rediriger vers home
+      if (!user.is_customer_service && user.role !== 'customer_service') {
+        navigate("/");
+        return;
+      }
+    } else if (user === null) {
+      // Si pas connecté, rediriger vers login
+      navigate("/login");
+      return;
+    }
+  }, [user, navigate]);
+
+  // Afficher loader pendant vérification
+  if (user === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Vérification des permissions...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <Routes>
       <Route element={<ServiceLayout />}>
-        <Route index element={<ServiceDashboard />} />
+        <Route index element={<SupportDashboardNew />} />
         <Route path="payments" element={<AdminPayments />} />
         <Route path="messages" element={<ServiceMessages />} />
         <Route path="clients" element={<ServiceClients />} />
