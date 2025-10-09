@@ -37,29 +37,29 @@ const Admin = () => {
   const navigate = useNavigate();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Redirection si pas admin (vérifier le rôle spécifique)
+  // Redirection si pas admin (vérifier UNIQUEMENT le rôle)
   useEffect(() => {
-    // Attendre que l'utilisateur soit chargé avant de vérifier
     if (user !== null) {
       setIsCheckingAuth(false);
       
-      // PRIORITÉ 1: Si c'est un service client, rediriger vers /support
-      if (user.role === 'customer_service' || user.is_customer_service) {
-        console.log('User is customer_service, redirecting to /support');
-        navigate("/support");
+      console.log('[ADMIN] User role:', user.role, 'is_staff:', user.is_staff);
+      
+      // PRIORITÉ 1: Si role est "customer_service", rediriger vers /support
+      if (user.role === 'customer_service') {
+        console.log('[ADMIN] → Redirecting to /support (customer_service role)');
+        navigate("/support", { replace: true });
         return;
       }
       
-      // PRIORITÉ 2: Si c'est un admin ou superuser ou staff (mais PAS service client)
-      const isAdminUser = user.is_admin_user || user.role === 'admin' || user.is_superuser || user.is_staff;
-      
-      if (!isAdminUser) {
-        console.log('User is not admin, redirecting to home');
-        navigate("/");
+      // PRIORITÉ 2: Si role est "admin" OU is_staff (pour compatibilité avec anciens comptes)
+      if (user.role === 'admin' || user.is_staff || user.is_superuser) {
+        console.log('[ADMIN] ✓ Staying on /admin');
         return;
       }
       
-      console.log('User is admin, staying on /admin');
+      // Sinon, rediriger vers home
+      console.log('[ADMIN] → Redirecting to home (not admin)');
+      navigate("/", { replace: true });
     }
   }, [user, navigate]);
 

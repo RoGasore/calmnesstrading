@@ -45,31 +45,30 @@ const Support = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Protection de route : uniquement service client
+  // Protection de route : uniquement service client (vérifier UNIQUEMENT le rôle)
   useEffect(() => {
     if (user !== null) {
-      console.log('Support page - User:', { role: user.role, is_customer_service: user.is_customer_service, is_admin_user: user.is_admin_user });
+      console.log('[SUPPORT] User role:', user.role, 'is_staff:', user.is_staff);
       
-      // PRIORITÉ 1: Si c'est un admin (PAS service client), rediriger vers /admin
-      if ((user.role === 'admin' || user.is_admin_user) && user.role !== 'customer_service') {
-        console.log('User is admin, redirecting to /admin');
-        navigate("/admin");
+      // PRIORITÉ 1: Si role est "admin", rediriger vers /admin
+      if (user.role === 'admin') {
+        console.log('[SUPPORT] → Redirecting to /admin (admin role)');
+        navigate("/admin", { replace: true });
         return;
       }
       
-      // PRIORITÉ 2: Si ce n'est pas service client, rediriger vers home
-      if (!user.is_customer_service && user.role !== 'customer_service') {
-        console.log('User is not customer_service, redirecting to home');
-        navigate("/");
+      // PRIORITÉ 2: Si role est "customer_service", rester
+      if (user.role === 'customer_service') {
+        console.log('[SUPPORT] ✓ Staying on /support');
         return;
       }
       
-      console.log('User is customer_service, staying on /support');
+      // Sinon, rediriger vers home
+      console.log('[SUPPORT] → Redirecting to home (not customer_service)');
+      navigate("/", { replace: true });
     } else if (user === null) {
-      // Si pas connecté, rediriger vers login
-      console.log('User not logged in, redirecting to /login');
-      navigate("/login");
-      return;
+      console.log('[SUPPORT] → Redirecting to /login (not logged in)');
+      navigate("/login", { replace: true });
     }
   }, [user, navigate]);
 
