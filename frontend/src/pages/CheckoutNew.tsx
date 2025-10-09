@@ -156,15 +156,25 @@ const CheckoutNew = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setPaymentId(data.id);
-        setCurrentStep('payment-pending');
-        
-        toast({
-          title: "Demande envoyée !",
-          description: "Notre équipe va vous contacter pour finaliser le paiement."
-        });
+        console.log('Payment created:', data);
+        // Le backend retourne l'objet complet, pas juste l'id
+        const id = data.id || data.payment?.id || data.pending_payment?.id;
+        if (id) {
+          setPaymentId(id);
+          setCurrentStep('payment-pending');
+          
+          toast({
+            title: "Demande envoyée !",
+            description: "Notre équipe va vous contacter pour finaliser le paiement."
+          });
+        } else {
+          console.error('No payment ID in response:', data);
+          throw new Error('ID de paiement non retourné par le serveur');
+        }
       } else {
-        throw new Error('Erreur lors de la création du paiement');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Error creating payment:', errorData);
+        throw new Error(errorData.error || 'Erreur lors de la création du paiement');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -251,7 +261,7 @@ const CheckoutNew = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 pt-24 pb-12 max-w-4xl">
         {/* Progress Steps */}
         <div className="mb-8">
           <div className="flex items-center justify-between max-w-3xl mx-auto">
