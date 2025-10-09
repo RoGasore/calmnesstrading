@@ -12,7 +12,9 @@ class OfferSerializer(serializers.ModelSerializer):
         model = Offer
         fields = [
             'id', 'name', 'description', 'offer_type', 'price', 'currency',
-            'duration_days', 'color_theme', 'metadata', 'is_active', 'created_at', 'updated_at'
+            'duration_days', 'duration_hours', 'duration_minutes',
+            'telegram_channel_id', 'discord_channel_id',
+            'color_theme', 'metadata', 'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 

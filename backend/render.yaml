@@ -1,0 +1,77 @@
+services:
+  # Service Web Principal (Django API)
+  - type: web
+    name: calmnesstrading-backend
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    startCommand: gunicorn backend.wsgi:application
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: False
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: calmnesstrading-db
+          property: connectionString
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME
+        sync: false
+      - key: TELEGRAM_CHANNEL_ID
+        sync: false
+      - key: TELEGRAM_CHANNEL_NAME
+        sync: false
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+
+  # Celery Worker (Traitement des tâches)
+  - type: worker
+    name: calmnesstrading-celery-worker
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt && pip install -r requirements_telegram.txt
+    startCommand: celery -A backend worker -l info --concurrency=2
+    envVars:
+      - fromGroup: calmnesstrading-backend
+
+  # Celery Beat (Scheduler des tâches automatiques)
+  - type: worker
+    name: calmnesstrading-celery-beat
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt && pip install -r requirements_telegram.txt
+    startCommand: celery -A backend beat -l info
+    envVars:
+      - fromGroup: calmnesstrading-backend
+
+  # Bot Telegram (Gestion des accès canal)
+  - type: worker
+    name: calmnesstrading-telegram-bot
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt && pip install -r requirements_telegram.txt
+    startCommand: python telegram_bot/bot.py
+    envVars:
+      - fromGroup: calmnesstrading-backend
+
+databases:
+  - name: calmnesstrading-db
+    databaseName: calmnesstrading
+    user: calmnesstrading
+    region: frankfurt
+    plan: free
+

@@ -11,8 +11,20 @@ fi
 
 # Installer les dépendances si requirements.txt existe
 if [ -f "requirements.txt" ]; then
-    echo "📦 Installation des dépendances..."
+    echo "📦 Installation des dépendances principales..."
     pip install -r requirements.txt
+fi
+
+# Installer les dépendances Telegram et Celery (système d'accès canal)
+if [ -f "requirements_telegram.txt" ]; then
+    echo "🤖 Installation des dépendances Telegram et Celery..."
+    pip install -r requirements_telegram.txt
+fi
+
+# Installer les dépendances Analytics (si présentes)
+if [ -f "requirements_analytics.txt" ]; then
+    echo "📊 Installation des dépendances Analytics..."
+    pip install -r requirements_analytics.txt
 fi
 
 # Appliquer les migrations

@@ -279,18 +279,53 @@ class CalmnessTradingBot:
                 if invite:
                     invite.mark_as_accepted()
                     
+                    # Récupérer les informations de l'offre depuis le bot_token
+                    bot_token = invite.bot_token
+                    
+                    # Récupérer la durée de l'abonnement depuis l'offre
+                    from payments.models import Payment
+                    try:
+                        payment = Payment.objects.filter(id=bot_token.payment_id).first()
+                        if payment and payment.offer:
+                            # Utiliser la durée de l'offre (en jours, heures ou minutes)
+                            offer = payment.offer
+                            subscription_type = offer.name
+                            
+                            # Calculer la date de fin selon la durée de l'offre
+                            if hasattr(offer, 'duration_days') and offer.duration_days:
+                                subscription_end_date = timezone.now() + timedelta(days=offer.duration_days)
+                            elif hasattr(offer, 'duration_hours') and offer.duration_hours:
+                                subscription_end_date = timezone.now() + timedelta(hours=offer.duration_hours)
+                            elif hasattr(offer, 'duration_minutes') and offer.duration_minutes:
+                                subscription_end_date = timezone.now() + timedelta(minutes=offer.duration_minutes)
+                            else:
+                                # Par défaut 30 jours si pas de durée spécifiée
+                                subscription_end_date = timezone.now() + timedelta(days=30)
+                        else:
+                            subscription_type = 'Abonnement'
+                            subscription_end_date = timezone.now() + timedelta(days=30)
+                    except Exception as e:
+                        logger.error(f"❌ Erreur récupération offre : {e}")
+                        subscription_type = 'Abonnement'
+                        subscription_end_date = timezone.now() + timedelta(days=30)
+                    
+                    # Utiliser le username Telegram validé lors du paiement
+                    telegram_username = user.username or ''
+                    if not telegram_username and invite.user.telegram_username:
+                        telegram_username = invite.user.telegram_username.replace('@', '')
+                    
                     # Créer ou mettre à jour le membership
                     membership, created = TelegramChannelMember.objects.update_or_create(
                         user=invite.user,
                         channel_id=chat_member_update.chat.id,
                         defaults={
                             'telegram_user_id': user.id,
-                            'telegram_username': user.username or '',
+                            'telegram_username': telegram_username,
                             'channel_name': CHANNEL_NAME,
                             'status': 'active',
-                            'subscription_type': 'Premium',  # À adapter selon l'offre
-                            'subscription_end_date': timezone.now() + timedelta(days=30),  # À adapter
-                            'expires_at': timezone.now() + timedelta(days=30),
+                            'subscription_type': subscription_type,
+                            'subscription_end_date': subscription_end_date,
+                            'expires_at': subscription_end_date,
                             'invite': invite
                         }
                     )

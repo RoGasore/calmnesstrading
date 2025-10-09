@@ -33,10 +33,10 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute=15),  # Toutes les heures à :15
     },
     
-    # Vérifier les abonnements expirés tous les jours à 00:00
-    'check-expired-subscriptions-daily': {
+    # Vérifier les abonnements expirés toutes les minutes (pour gérer les abonnements courts)
+    'check-expired-subscriptions-every-minute': {
         'task': 'accounts.tasks_telegram.check_expired_subscriptions',
-        'schedule': crontab(hour=0, minute=0),  # Tous les jours à 00:00
+        'schedule': crontab(),  # Toutes les minutes
     },
     
     # Envoyer les notifications d'expiration tous les jours à 09:00

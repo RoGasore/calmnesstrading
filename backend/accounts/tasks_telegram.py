@@ -55,14 +55,14 @@ def expire_old_invites():
 def check_expired_subscriptions():
     """
     Vérifier et révoquer les abonnements expirés
-    À exécuter tous les jours à 00:00
+    À exécuter toutes les minutes pour gérer les abonnements courts (5min, etc.)
     """
     now = timezone.now()
     
     # Trouver tous les membres actifs avec abonnement expiré
     expired_members = TelegramChannelMember.objects.filter(
         status='active',
-        subscription_end_date__lt=now
+        subscription_end_date__lte=now  # <= pour inclure l'instant exact
     )
     
     revoked_count = 0

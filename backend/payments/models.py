@@ -32,8 +32,10 @@ class Offer(models.Model):
     currency = models.CharField(max_length=3, default='EUR', verbose_name="Devise")
     color_theme = models.CharField(max_length=20, choices=COLOR_CHOICES, default='gold', verbose_name="Couleur")
     
-    # Pour les abonnements
+    # Pour les abonnements (durée flexible)
     duration_days = models.IntegerField(null=True, blank=True, verbose_name="Durée (jours)")
+    duration_hours = models.IntegerField(null=True, blank=True, verbose_name="Durée (heures)")
+    duration_minutes = models.IntegerField(null=True, blank=True, verbose_name="Durée (minutes)")
     
     # Canaux privés associés
     telegram_channel_id = models.CharField(max_length=255, blank=True, verbose_name="ID canal Telegram")
