@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePayment } from "@/contexts/PaymentContext";
+import { useToast } from "@/hooks/use-toast";
 import { API_CONFIG } from "@/config/api";
 import { WidgetContainer } from "@/components/admin/widgets/WidgetContainer";
 import { WidgetSettings } from "@/components/admin/widgets/WidgetSettings";
@@ -17,12 +19,18 @@ import {
   CheckCircle,
   MessageSquare,
   Package,
-  Settings
+  Target,
+  Loader2,
+  ArrowUpRight,
+  ArrowDownRight
 } from "lucide-react";
 
 const SupportDashboardNew = () => {
   const { fetchWithAuth } = useAuth();
-  const { adminDashboard, fetchAdminDashboard } = usePayment();
+  const { adminDashboard, fetchAdminDashboard, loading: paymentLoading } = usePayment();
+  const { toast } = useToast();
+  
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     pendingPayments: 0,
     totalRevenue: 0,
@@ -32,18 +40,12 @@ const SupportDashboardNew = () => {
     pendingOrders: 0,
   });
   const [recentActivity, setRecentActivity] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     setLoading(true);
     try {
       await fetchAdminDashboard();
       
-      // Charger stats supplémentaires si nécessaire
       const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/payments/admin/dashboard/`);
       if (response.ok) {
         const data = await response.json();
@@ -59,20 +61,48 @@ const SupportDashboardNew = () => {
       }
     } catch (error) {
       console.error('Error loading dashboard:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchAdminDashboard, fetchWithAuth, toast]);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
+
+  // Calculer les objectifs
+  const goals = useMemo(() => ({
+    payments: {
+      current: stats.pendingPayments,
+      target: 10,
+      percentage: Math.min((stats.pendingPayments / 10) * 100, 100)
+    },
+    revenue: {
+      current: stats.totalRevenue,
+      target: 5000,
+      percentage: Math.min((stats.totalRevenue / 5000) * 100, 100)
+    },
+    clients: {
+      current: stats.totalClients,
+      target: 100,
+      percentage: Math.min((stats.totalClients / 100) * 100, 100)
+    }
+  }), [stats]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 md:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4">
-          <SidebarTrigger />
+          <SidebarTrigger className="-ml-2" />
           <div>
-            <h1 className="text-3xl font-bold">Dashboard Support</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-2xl md:text-3xl font-bold">Dashboard Support</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Gestion des opérations et support client
             </p>
           </div>
@@ -89,22 +119,34 @@ const SupportDashboardNew = () => {
             id: 'payments',
             title: 'Paiements en attente',
             component: (
-              <Card className="border-l-4 border-yellow-500">
+              <Card className="border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Paiements en attente</CardTitle>
-                  <Clock className="h-5 w-5 text-yellow-600" />
+                  <div className="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center">
+                    <Clock className="h-5 w-5 text-yellow-600" />
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.pendingPayments}</div>
+                  <div className="text-3xl font-bold">{stats.pendingPayments}</div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 border-yellow-300">
+                      Urgent
+                    </Badge>
+                    <p className="text-xs text-muted-foreground">
+                      Nécessite attention
+                    </p>
+                  </div>
+                  <Progress value={goals.payments.percentage} className="mt-3 h-2" />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Nécessite votre attention
+                    {goals.payments.current}/{goals.payments.target} objectif
                   </p>
                   <Button 
                     className="mt-3 w-full" 
                     size="sm"
+                    style={{ backgroundColor: '#D4AF37', color: '#000000' }}
                     onClick={() => window.location.href = '/support/payments'}
                   >
-                    Gérer les paiements
+                    Gérer maintenant
                   </Button>
                 </CardContent>
               </Card>
