@@ -100,27 +100,57 @@ async function tryRefreshToken(): Promise<boolean> {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [user, setUser] = useState<User | null>(null);
+	const [isInitialized, setIsInitialized] = useState(false);
 
 	useEffect(() => {
-		const savedUser = localStorage.getItem('user_profile');
-		const savedRefreshToken = localStorage.getItem('refresh_token');
-		const savedAccessToken = localStorage.getItem('access_token');
-		
-		if (savedUser && savedRefreshToken) {
-			try { 
-				setUser(JSON.parse(savedUser)); 
-				// Restaurer le token d'accès s'il existe
-				if (savedAccessToken) {
-					inMemoryAccessToken = savedAccessToken;
-				} else {
-					// Sinon essayer de le rafraîchir
-					tryRefreshToken();
+		const initAuth = async () => {
+			const savedUser = localStorage.getItem('user_profile');
+			const savedRefreshToken = localStorage.getItem('refresh_token');
+			const savedAccessToken = localStorage.getItem('access_token');
+			
+			console.log('🔐 Auth init:', { 
+				hasUser: !!savedUser, 
+				hasRefresh: !!savedRefreshToken, 
+				hasAccess: !!savedAccessToken 
+			});
+			
+			if (savedUser && savedRefreshToken) {
+				try { 
+					const userData = JSON.parse(savedUser);
+					setUser(userData);
+					
+					// Restaurer le token d'accès s'il existe
+					if (savedAccessToken) {
+						inMemoryAccessToken = savedAccessToken;
+						console.log('✅ Access token restored');
+					} else {
+						// Sinon essayer de le rafraîchir
+						console.log('🔄 Refreshing token...');
+						const refreshed = await tryRefreshToken();
+						if (!refreshed) {
+							console.warn('⚠️ Token refresh failed');
+							setUser(null);
+						}
+					}
+				} catch (error) { 
+					console.error('❌ Auth init error:', error);
+					clearTokens();
+					setUser(null);
 				}
-			} catch { 
-				clearTokens();
 			}
-		}
+			
+			setIsInitialized(true);
+		};
+		
+		initAuth();
 	}, []);
+
+	// Afficher un loader pendant l'initialisation
+	if (!isInitialized) {
+		return <div className="min-h-screen flex items-center justify-center">
+			<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+		</div>;
+	}
 
 	const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; errorType?: string }> => {
 		console.log('🔐 Login attempt:', { email, password: '***', apiBase: API_BASE });
