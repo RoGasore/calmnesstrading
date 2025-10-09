@@ -47,6 +47,8 @@ interface PendingPayment {
   currency: string;
   contact_method: string;
   contact_info: string;
+  user_info?: any;
+  transaction_id?: string;
   status: string;
   created_at: string;
   admin_notes?: string;
@@ -254,7 +256,7 @@ const AdminPayments = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {payment.status === 'pending' && (
+                          {(payment.status === 'pending' || payment.status === 'transaction_submitted' || payment.status === 'contacted') && (
                             <>
                               <Button
                                 variant="default"
@@ -263,9 +265,10 @@ const AdminPayments = () => {
                                   setSelectedPayment(payment);
                                   setValidateDialogOpen(true);
                                 }}
+                                style={payment.status === 'transaction_submitted' ? { backgroundColor: '#D4AF37', color: '#000000' } : {}}
                               >
                                 <CheckCircle className="h-4 w-4 mr-1" />
-                                Valider
+                                {payment.status === 'transaction_submitted' ? 'Vérifier & Valider' : 'Valider'}
                               </Button>
                               <Button
                                 variant="destructive"
@@ -320,6 +323,29 @@ const AdminPayments = () => {
                 <Label className="text-muted-foreground">Statut</Label>
                 <div>{getStatusBadge(selectedPayment.status)}</div>
               </div>
+              {selectedPayment.transaction_id && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border-2 border-yellow-300">
+                  <Label className="text-muted-foreground">ID de Transaction</Label>
+                  <div className="font-mono font-bold text-lg" style={{ color: '#D4AF37' }}>
+                    {selectedPayment.transaction_id}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Fourni par l'utilisateur après paiement
+                  </p>
+                </div>
+              )}
+              {selectedPayment.user_info && Object.keys(selectedPayment.user_info).length > 0 && (
+                <div>
+                  <Label className="text-muted-foreground">Informations Utilisateur</Label>
+                  <div className="text-sm space-y-1 mt-2 bg-muted p-3 rounded">
+                    {selectedPayment.user_info.full_name && <p><strong>Nom :</strong> {selectedPayment.user_info.full_name}</p>}
+                    {selectedPayment.user_info.email && <p><strong>Email :</strong> {selectedPayment.user_info.email}</p>}
+                    {selectedPayment.user_info.telegram_username && <p><strong>Telegram :</strong> {selectedPayment.user_info.telegram_username}</p>}
+                    {selectedPayment.user_info.whatsapp_number && <p><strong>WhatsApp :</strong> {selectedPayment.user_info.whatsapp_number}</p>}
+                    {selectedPayment.user_info.discord_username && <p><strong>Discord :</strong> {selectedPayment.user_info.discord_username}</p>}
+                  </div>
+                </div>
+              )}
               <div>
                 <Label className="text-muted-foreground">Date de création</Label>
                 <div className="text-sm">{new Date(selectedPayment.created_at).toLocaleString('fr-FR')}</div>
@@ -331,30 +357,99 @@ const AdminPayments = () => {
 
       {/* Dialog de validation */}
       <Dialog open={validateDialogOpen} onOpenChange={setValidateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Valider le paiement</DialogTitle>
             <DialogDescription>
-              Confirmez la validation de ce paiement. Vous pouvez ajouter des notes pour l'utilisateur.
+              Vérifiez les informations et confirmez la validation. Une facture sera générée et envoyée automatiquement.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="admin-notes">Notes (optionnel)</Label>
-              <Textarea
-                id="admin-notes"
-                placeholder="Ajoutez des notes pour l'utilisateur..."
-                value={adminNotes}
-                onChange={(e) => setAdminNotes(e.target.value)}
-              />
+          {selectedPayment && (
+            <div className="space-y-4">
+              {/* Récapitulatif */}
+              <div className="bg-muted p-4 rounded-lg space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Utilisateur</span>
+                  <span className="font-medium">{selectedPayment.user.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Offre</span>
+                  <span className="font-medium">{selectedPayment.offer.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Montant</span>
+                  <span className="font-bold text-lg" style={{ color: '#D4AF37' }}>
+                    {selectedPayment.amount} {selectedPayment.currency}
+                  </span>
+                </div>
+              </div>
+
+              {/* Transaction ID si disponible */}
+              {selectedPayment.transaction_id && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border-2 border-[#D4AF37]">
+                  <Label className="text-sm text-muted-foreground">ID de Transaction Soumis</Label>
+                  <div className="font-mono font-bold text-xl mt-2" style={{ color: '#D4AF37' }}>
+                    {selectedPayment.transaction_id}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    ⚠️ Vérifiez cet ID dans votre système bancaire avant de valider
+                  </p>
+                </div>
+              )}
+
+              {/* Informations utilisateur */}
+              {selectedPayment.user_info && Object.keys(selectedPayment.user_info).length > 0 && (
+                <div>
+                  <Label>Informations de Contact</Label>
+                  <div className="text-sm space-y-1 mt-2 bg-muted p-3 rounded">
+                    {selectedPayment.user_info.telegram_username && (
+                      <p><strong>📱 Telegram :</strong> {selectedPayment.user_info.telegram_username}</p>
+                    )}
+                    {selectedPayment.user_info.whatsapp_number && (
+                      <p><strong>💬 WhatsApp :</strong> {selectedPayment.user_info.whatsapp_number}</p>
+                    )}
+                    {selectedPayment.user_info.discord_username && (
+                      <p><strong>🎮 Discord :</strong> {selectedPayment.user_info.discord_username}</p>
+                    )}
+                    {selectedPayment.user_info.email && (
+                      <p><strong>📧 Email :</strong> {selectedPayment.user_info.email}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="admin-notes">Notes Admin (optionnel)</Label>
+                <Textarea
+                  id="admin-notes"
+                  placeholder="Ajoutez des notes pour la facture ou le client..."
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  rows={3}
+                />
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm">
+                <p className="font-medium mb-1">✨ Actions automatiques après validation :</p>
+                <ul className="text-muted-foreground space-y-1">
+                  <li>• Génération facture PDF (numéro CT-XXXXX)</li>
+                  <li>• Envoi email avec facture en pièce jointe</li>
+                  <li>• Notification Telegram (si configuré)</li>
+                  <li>• Activation abonnement automatique</li>
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setValidateDialogOpen(false)}>
               Annuler
             </Button>
-            <Button onClick={handleValidatePayment}>
-              Valider le paiement
+            <Button 
+              onClick={handleValidatePayment}
+              style={{ backgroundColor: '#D4AF37', color: '#000000' }}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Valider et Envoyer Facture
             </Button>
           </DialogFooter>
         </DialogContent>
