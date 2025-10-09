@@ -17,7 +17,7 @@ urlpatterns = [
     
     # ==================== PAIEMENTS (UTILISATEUR) ====================
     path('payments/', views.UserPaymentListView.as_view(), name='user_payments'),
-    path('payments/<int:payment_id>/submit-transaction/', views.submit_transaction_id, name='submit_transaction'),
+    path('<int:payment_id>/submit-transaction/', views.submit_transaction_id, name='submit_transaction'),
     
     # ==================== ABONNEMENTS (UTILISATEUR) ====================
     path('subscriptions/', views.UserSubscriptionListView.as_view(), name='user_subscriptions'),
