@@ -1,0 +1,5 @@
+# Telegram Bot Dependencies
+python-telegram-bot==20.7
+celery==5.3.4
+redis==5.0.1
+

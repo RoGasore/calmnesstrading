@@ -37,7 +37,14 @@ const SupportDashboardNew = () => {
       // Charger les données de paiements
       await fetchAdminDashboardRef.current();
       
-      // Charger les statistiques utilisateurs
+      // Charger les statistiques support
+      const supportStatsResponse = await fetchWithAuthRef.current(`${API_BASE}/api/support/dashboard/`);
+      if (supportStatsResponse.ok) {
+        const supportStats = await supportStatsResponse.json();
+        setStatsData(supportStats);
+      }
+      
+      // Charger les statistiques utilisateurs (fallback)
       const statsResponse = await fetchWithAuthRef.current(`${API_BASE}/api/auth/admin/overview/stats/`);
       if (statsResponse.ok) {
         const statsData = await statsResponse.json();

@@ -88,82 +88,13 @@ const SupportMessages = () => {
   const loadMessages = async () => {
     setLoading(true);
     try {
-      // Simuler des données pour le moment
-      const mockMessages: Message[] = [
-        {
-          id: 1,
-          user: {
-            id: 1,
-            name: "Jean Dupont",
-            email: "jean@example.com",
-            telegram_username: "@jeandupont",
-            phone: "+33123456789"
-          },
-          subject: "Problème avec mon abonnement",
-          message: "Bonjour, j'ai un problème avec mon abonnement aux signaux. Je ne reçois plus les notifications Telegram.",
-          status: "unread",
-          priority: "high",
-          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-          replies: []
-        },
-        {
-          id: 2,
-          user: {
-            id: 2,
-            name: "Marie Martin",
-            email: "marie@example.com",
-            phone: "+33987654321"
-          },
-          subject: "Question sur la formation",
-          message: "Salut ! J'aimerais savoir quand aura lieu la prochaine session de formation sur l'analyse technique.",
-          status: "read",
-          priority: "medium",
-          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-          replies: [
-            {
-              id: 1,
-              message: "Bonjour Marie, la prochaine session aura lieu mercredi prochain à 19h. Je vous envoie le lien par email.",
-              is_from_support: true,
-              created_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-              created_by: {
-                name: "Service Client",
-                role: "customer_service"
-              }
-            }
-          ]
-        },
-        {
-          id: 3,
-          user: {
-            id: 3,
-            name: "Pierre Durand",
-            email: "pierre@example.com",
-            telegram_username: "@pierredurand"
-          },
-          subject: "Demande de remboursement",
-          message: "Je souhaite annuler mon abonnement et obtenir un remboursement. Le service ne correspond pas à mes attentes.",
-          status: "replied",
-          priority: "urgent",
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-          replies: [
-            {
-              id: 2,
-              message: "Bonjour Pierre, nous comprenons votre demande. Pouvez-vous nous préciser la raison exacte de votre insatisfaction ?",
-              is_from_support: true,
-              created_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-              created_by: {
-                name: "Service Client",
-                role: "customer_service"
-              }
-            }
-          ]
-        }
-      ];
-      
-      setMessages(mockMessages);
+      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/support/messages/`);
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data);
+      } else {
+        throw new Error('Erreur lors du chargement des messages');
+      }
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -185,38 +116,31 @@ const SupportMessages = () => {
     if (!selectedMessage || !newMessage.trim()) return;
     
     try {
-      // Simuler l'envoi de réponse
-      const reply: Reply = {
-        id: Date.now(),
-        message: newMessage,
-        is_from_support: true,
-        created_at: new Date().toISOString(),
-        created_by: {
-          name: "Service Client",
-          role: "customer_service"
-        }
-      };
-      
-      // Mettre à jour le message
-      setMessages(prev => prev.map(msg => 
-        msg.id === selectedMessage.id 
-          ? { 
-              ...msg, 
-              replies: [...(msg.replies || []), reply],
-              status: 'replied' as const,
-              updated_at: new Date().toISOString()
-            }
-          : msg
-      ));
-      
-      setNewMessage("");
-      setReplyDialogOpen(false);
-      setViewDialogOpen(false);
-      
-      toast({
-        title: "Réponse envoyée",
-        description: "Votre réponse a été envoyée avec succès.",
+      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/support/messages/${selectedMessage.id}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          reply_text: newMessage
+        })
       });
+      
+      if (response.ok) {
+        setNewMessage("");
+        setReplyDialogOpen(false);
+        setViewDialogOpen(false);
+        
+        // Recharger les messages pour avoir la mise à jour
+        loadMessages();
+        
+        toast({
+          title: "Réponse envoyée",
+          description: "Votre réponse a été envoyée avec succès.",
+        });
+      } else {
+        throw new Error('Erreur lors de l\'envoi de la réponse');
+      }
     } catch (error) {
       toast({
         title: "Erreur",

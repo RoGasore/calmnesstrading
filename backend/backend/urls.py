@@ -22,5 +22,7 @@ urlpatterns = [
     path('api/auth/', include('accounts.urls')),
     path('api/content/', include('content.urls')),
     path('api/payments/', include('payments.urls')),
+    path('api/support/', include('accounts.urls_support')),
+    path('api/telegram/', include('accounts.urls_telegram')),
     path('', include('analytics.urls')),
 ]

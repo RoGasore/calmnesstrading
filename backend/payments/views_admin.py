@@ -99,6 +99,47 @@ def validate_pending_payment(request):
         pending_payment.admin_notes = admin_notes
         pending_payment.save()
         
+        # 🤖 GÉNÉRATION AUTOMATIQUE DU TOKEN TELEGRAM
+        try:
+            from accounts.models_telegram import TelegramBotToken, TelegramNotification
+            from django.conf import settings
+            
+            # Générer le token Telegram (valide 24h)
+            bot_token = TelegramBotToken.generate_token(
+                user=pending_payment.user,
+                payment_id=payment.id,
+                transaction_id=transaction_id,
+                expiry_hours=24
+            )
+            
+            # Générer le lien vers le bot
+            bot_username = settings.TELEGRAM_BOT_USERNAME
+            if bot_username:
+                bot_link = f"https://t.me/{bot_username}?start={bot_token.token}"
+                
+                # Créer une notification Telegram
+                TelegramNotification.objects.create(
+                    user=pending_payment.user,
+                    notification_type='payment_verified',
+                    title='🎉 Paiement validé !',
+                    message=f'Votre paiement a été validé avec succès. Cliquez sur le lien ci-dessous pour accéder à votre canal Telegram privé : {settings.TELEGRAM_CHANNEL_NAME}',
+                    action_url=bot_link,
+                    metadata={
+                        'payment_id': payment.id,
+                        'token': bot_token.token,
+                        'expires_at': bot_token.expires_at.isoformat(),
+                        'offer_name': pending_payment.offer.name
+                    }
+                ).mark_as_sent(via_site=True)
+                
+                print(f"✅ Token Telegram généré pour {pending_payment.user.username}")
+                print(f"🔗 Lien: {bot_link}")
+        except Exception as e:
+            # Ne pas bloquer la validation si la génération du token échoue
+            print(f"⚠️ Erreur génération token Telegram : {e}")
+            import traceback
+            traceback.print_exc()
+        
         # Si c'est un abonnement, créer l'abonnement
         subscription = None
         if pending_payment.offer.offer_type == 'subscription' and pending_payment.offer.duration_days:

@@ -28,90 +28,41 @@ const SupportRevenues = () => {
     fetchAdminDashboard();
   }, [fetchAdminDashboard]);
 
-  // Calcul des statistiques de revenus
-  const calculateStats = () => {
-    if (!adminDashboard?.payment_history) {
-      return {
-        totalRevenue: 0,
-        thisMonth: 0,
-        lastMonth: 0,
-        growth: 0,
-        totalTransactions: 0,
-        activeSubscriptions: 0
-      };
-    }
+  const [revenueData, setRevenueData] = useState<any>(null);
 
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  useEffect(() => {
+    loadRevenueData();
+  }, []);
 
-    const totalRevenue = adminDashboard.payment_history.reduce(
-      (sum: number, p: any) => sum + parseFloat(p.amount), 
-      0
-    );
-
-    const thisMonthRevenue = adminDashboard.payment_history
-      .filter((p: any) => {
-        const date = new Date(p.created_at);
-        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-      })
-      .reduce((sum: number, p: any) => sum + parseFloat(p.amount), 0);
-
-    const lastMonthRevenue = adminDashboard.payment_history
-      .filter((p: any) => {
-        const date = new Date(p.created_at);
-        return date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear;
-      })
-      .reduce((sum: number, p: any) => sum + parseFloat(p.amount), 0);
-
-    const growth = lastMonthRevenue > 0 
-      ? ((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100 
-      : 0;
-
-    return {
-      totalRevenue,
-      thisMonth: thisMonthRevenue,
-      lastMonth: lastMonthRevenue,
-      growth,
-      totalTransactions: adminDashboard.payment_history.length,
-      activeSubscriptions: adminDashboard.active_subscriptions || 0
-    };
-  };
-
-  const stats = calculateStats();
-
-  // Regroupement des revenus par offre
-  const revenueByOffer = () => {
-    if (!adminDashboard?.payment_history) return [];
-
-    const offerMap = new Map();
-
-    adminDashboard.payment_history.forEach((payment: any) => {
-      const offerName = payment.offer.name;
-      if (offerMap.has(offerName)) {
-        const existing = offerMap.get(offerName);
-        offerMap.set(offerName, {
-          name: offerName,
-          count: existing.count + 1,
-          revenue: existing.revenue + parseFloat(payment.amount),
-          currency: payment.currency
-        });
-      } else {
-        offerMap.set(offerName, {
-          name: offerName,
-          count: 1,
-          revenue: parseFloat(payment.amount),
-          currency: payment.currency
-        });
+  const loadRevenueData = async () => {
+    try {
+      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/support/revenues/`);
+      if (response.ok) {
+        const data = await response.json();
+        setRevenueData(data);
       }
-    });
-
-    return Array.from(offerMap.values()).sort((a, b) => b.revenue - a.revenue);
+    } catch (error) {
+      console.error('Error loading revenue data:', error);
+    }
   };
 
-  const offerStats = revenueByOffer();
+  const stats = revenueData ? {
+    totalRevenue: revenueData.total_revenue,
+    thisMonth: revenueData.this_month,
+    lastMonth: revenueData.last_month,
+    growth: revenueData.growth,
+    totalTransactions: revenueData.total_transactions,
+    activeSubscriptions: 0 // Pas encore implémenté
+  } : {
+    totalRevenue: 0,
+    thisMonth: 0,
+    lastMonth: 0,
+    growth: 0,
+    totalTransactions: 0,
+    activeSubscriptions: 0
+  };
+
+  const offerStats = revenueData?.offer_stats || [];
 
   return (
     <div className="space-y-6">
@@ -268,7 +219,7 @@ const SupportRevenues = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {!adminDashboard?.payment_history || adminDashboard.payment_history.length === 0 ? (
+                {!revenueData?.recent_payments || revenueData.recent_payments.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     Aucun paiement validé
                   </div>
@@ -284,7 +235,7 @@ const SupportRevenues = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {adminDashboard.payment_history.slice(0, 10).map((payment: any) => (
+                      {revenueData.recent_payments.slice(0, 10).map((payment: any) => (
                         <TableRow key={payment.id}>
                           <TableCell className="text-sm">
                             {new Date(payment.created_at).toLocaleDateString('fr-FR')}
@@ -295,7 +246,7 @@ const SupportRevenues = () => {
                               <div className="text-sm text-muted-foreground">{payment.user.email}</div>
                             </div>
                           </TableCell>
-                          <TableCell>{payment.offer.name}</TableCell>
+                          <TableCell>{payment.offer?.name || 'Offre'}</TableCell>
                           <TableCell className="text-right font-medium">
                             {payment.amount} {payment.currency}
                           </TableCell>

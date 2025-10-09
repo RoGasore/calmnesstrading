@@ -84,103 +84,22 @@ const SupportClients = () => {
 
   useEffect(() => {
     loadClients();
-  }, []);
+  }, [searchTerm, statusFilter]);
 
   const loadClients = async () => {
     setLoading(true);
     try {
-      // Simuler des données pour le moment
-      const mockClients: Client[] = [
-        {
-          id: 1,
-          name: "Jean Dupont",
-          email: "jean@example.com",
-          phone: "+33123456789",
-          telegram_username: "@jeandupont",
-          is_active: true,
-          is_verified: true,
-          role: "user",
-          created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-          last_login: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          subscription: {
-            name: "Signaux Premium",
-            status: "active",
-            expires_at: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString()
-          },
-          total_spent: 297.00,
-          support_tickets: 3,
-          payment_history: [
-            {
-              id: 1,
-              amount: 297.00,
-              currency: "EUR",
-              status: "confirmed",
-              created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-              offer: { name: "Signaux Premium" }
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: "Marie Martin",
-          email: "marie@example.com",
-          phone: "+33987654321",
-          discord_username: "marie_martin#1234",
-          is_active: true,
-          is_verified: true,
-          role: "user",
-          created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-          last_login: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-          subscription: {
-            name: "Formation Complète",
-            status: "active",
-            expires_at: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString()
-          },
-          total_spent: 497.00,
-          support_tickets: 1,
-          payment_history: [
-            {
-              id: 2,
-              amount: 497.00,
-              currency: "EUR",
-              status: "confirmed",
-              created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-              offer: { name: "Formation Complète" }
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: "Pierre Durand",
-          email: "pierre@example.com",
-          telegram_username: "@pierredurand",
-          whatsapp_number: "+33111222333",
-          is_active: false,
-          is_verified: true,
-          role: "user",
-          created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-          last_login: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-          subscription: {
-            name: "Signaux Basic",
-            status: "expired",
-            expires_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString()
-          },
-          total_spent: 97.00,
-          support_tickets: 2,
-          payment_history: [
-            {
-              id: 3,
-              amount: 97.00,
-              currency: "EUR",
-              status: "confirmed",
-              created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-              offer: { name: "Signaux Basic" }
-            }
-          ]
-        }
-      ];
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('search', searchTerm);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
       
-      setClients(mockClients);
+      const response = await fetchWithAuth(`${API_CONFIG.BASE_URL}/api/support/clients/?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setClients(data);
+      } else {
+        throw new Error('Erreur lors du chargement des clients');
+      }
     } catch (error) {
       console.error('Error loading clients:', error);
       toast({

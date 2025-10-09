@@ -22,6 +22,34 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables
 load_dotenv(dotenv_path=BASE_DIR / '.env', override=False)
 
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_BOT_USERNAME = os.getenv('TELEGRAM_BOT_USERNAME', '')
+TELEGRAM_CHANNEL_ID = int(os.getenv('TELEGRAM_CHANNEL_ID', '0'))
+TELEGRAM_CHANNEL_NAME = os.getenv('TELEGRAM_CHANNEL_NAME', 'Calmness Trading Signals')
+
+# Celery Configuration (Upstash Redis)
+UPSTASH_REDIS_REST_URL = os.getenv('UPSTASH_REDIS_REST_URL', '')
+UPSTASH_REDIS_REST_TOKEN = os.getenv('UPSTASH_REDIS_REST_TOKEN', '')
+
+# Construire l'URL Redis pour Celery
+if UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN:
+    # Extraire le host de l'URL REST
+    redis_host = UPSTASH_REDIS_REST_URL.replace('https://', '').replace('http://', '')
+    CELERY_BROKER_URL = f'rediss://:{UPSTASH_REDIS_REST_TOKEN}@{redis_host}:6379'
+    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+else:
+    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+    CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+
+# Celery Settings
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Paris'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
