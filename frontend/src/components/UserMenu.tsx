@@ -14,12 +14,17 @@ const UserMenu = () => {
   const avatarInitial = (displayName && displayName.charAt(0)) || "?";
 
   const handleClick = () => {
-    // Rediriger selon le rôle : admin, service client, ou utilisateur
-    if (isAdmin()) {
-      navigate("/admin");
-    } else if (user.is_customer_service) {
+    // Rediriger selon le rôle : vérifier RÔLE SPÉCIFIQUE d'abord
+    // 1. Service client en premier (a is_staff mais role='customer_service')
+    if (user.is_customer_service || user.role === 'customer_service') {
       navigate("/support");
-    } else {
+    }
+    // 2. Admin ensuite (role='admin' ou superuser)
+    else if (user.is_admin_user || user.role === 'admin' || isAdmin()) {
+      navigate("/admin");
+    }
+    // 3. Utilisateur normal par défaut
+    else {
       navigate("/user");
     }
   };
@@ -30,8 +35,8 @@ const UserMenu = () => {
       className="relative h-10 w-10 rounded-full hover:ring-2 hover:ring-primary transition-all" 
       onClick={handleClick}
       title={
-        isAdmin() ? "Aller au Panel Admin" : 
-        user.is_customer_service ? "Aller au Service Client" : 
+        user.is_customer_service || user.role === 'customer_service' ? "Aller au Support" : 
+        user.is_admin_user || user.role === 'admin' || isAdmin() ? "Aller au Panel Admin" : 
         "Aller à Mon Espace"
       }
     >

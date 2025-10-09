@@ -58,6 +58,11 @@ export function SupportWidget() {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Ne pas afficher le widget pour les admins et service client
+  if (user && (user.is_staff || user.is_customer_service || user.is_admin_user)) {
+    return null;
+  }
+
   const supportChannels = [
     {
       name: 'WhatsApp',
