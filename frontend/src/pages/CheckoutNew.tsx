@@ -27,8 +27,11 @@ import { usePayment, Offer } from "@/contexts/PaymentContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { API_CONFIG } from "@/config/api";
 
 type PaymentStep = 'verify-info' | 'payment-pending' | 'enter-transaction' | 'success';
+
+const API_BASE = API_CONFIG.BASE_URL;
 
 const CheckoutNew = () => {
   const [searchParams] = useSearchParams();
@@ -136,7 +139,7 @@ const CheckoutNew = () => {
 
     try {
       // Créer le paiement en attente
-      const response = await fetchWithAuth('/api/payments/pending-payments/create/', {
+      const response = await fetchWithAuth(`${API_BASE}/api/payments/pending-payments/create/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -192,7 +195,7 @@ const CheckoutNew = () => {
     setLoading(true);
 
     try {
-      const response = await fetchWithAuth(`/api/payments/${paymentId}/submit-transaction/`, {
+      const response = await fetchWithAuth(`${API_BASE}/api/payments/${paymentId}/submit-transaction/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
