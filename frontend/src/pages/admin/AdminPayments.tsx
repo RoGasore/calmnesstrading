@@ -18,18 +18,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { 
   CreditCard, 
   CheckCircle, 
+  CheckCircle2,
   XCircle, 
   Clock, 
-  Loader2,
+  Loader2, 
   Eye,
   DollarSign,
   Users,
-  TrendingUp
+  TrendingUp,
+  AlertCircle,
+  MessageSquare,
+  MessageCircle,
+  Phone
 } from "lucide-react";
 import { usePayment } from "@/contexts/PaymentContext";
 import { useToast } from "@/hooks/use-toast";
@@ -45,6 +57,7 @@ interface PendingPayment {
   offer: {
     name: string;
   };
+  offer_type?: string;
   amount: number;
   currency: string;
   contact_method: string;
@@ -68,6 +81,12 @@ const AdminPayments = () => {
   const [validateDialogOpen, setValidateDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState("");
+  const [adminTransactionId, setAdminTransactionId] = useState("");
+  
+  // Collapsibles
+  const [showOfferDetails, setShowOfferDetails] = useState(true);
+  const [showUserInfo, setShowUserInfo] = useState(true);
+  const [showTransactionInfo, setShowTransactionInfo] = useState(true);
 
   useEffect(() => {
     fetchAdminDashboard();
@@ -93,14 +112,26 @@ const AdminPayments = () => {
   const handleValidatePayment = async () => {
     if (!selectedPayment) return;
     
+    const transactionId = selectedPayment.transaction_id || adminTransactionId.trim();
+    
+    if (!transactionId) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez entrer un ID de transaction.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
-      await validatePendingPayment(selectedPayment.id, adminNotes);
+      await validatePendingPayment(selectedPayment.id, adminNotes, transactionId);
       toast({
         title: "Paiement validé",
-        description: "Le paiement a été validé avec succès.",
+        description: "Le paiement a été validé avec succès. La facture a été envoyée.",
       });
       setValidateDialogOpen(false);
       setAdminNotes("");
+      setAdminTransactionId("");
       fetchAdminDashboard();
       loadAllPendingPayments();
     } catch (error) {
@@ -385,97 +416,240 @@ const AdminPayments = () => {
       </Dialog>
 
       {/* Dialog de validation */}
-      <Dialog open={validateDialogOpen} onOpenChange={setValidateDialogOpen}>
-        <DialogContent className="max-w-2xl">
+      <Dialog open={validateDialogOpen} onOpenChange={(open) => {
+        setValidateDialogOpen(open);
+        if (open && selectedPayment) {
+          setAdminTransactionId(selectedPayment.transaction_id || '');
+        }
+      }}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Valider le paiement</DialogTitle>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <CheckCircle className="h-6 w-6" style={{ color: '#D4AF37' }} />
+              Valider le Paiement #{selectedPayment?.id}
+            </DialogTitle>
             <DialogDescription>
-              Vérifiez les informations et confirmez la validation. Une facture sera générée et envoyée automatiquement.
+              Vérifiez toutes les informations avant de valider. Une facture sera générée et envoyée automatiquement.
             </DialogDescription>
           </DialogHeader>
+          
           {selectedPayment && (
             <div className="space-y-4">
-              {/* Récapitulatif */}
-              <div className="bg-muted p-4 rounded-lg space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Utilisateur</span>
-                  <span className="font-medium">{selectedPayment.user.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Offre</span>
-                  <span className="font-medium">{selectedPayment.offer.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Montant</span>
-                  <span className="font-bold text-lg" style={{ color: '#D4AF37' }}>
-                    {selectedPayment.amount} {selectedPayment.currency}
-                  </span>
-                </div>
-              </div>
-
-              {/* Transaction ID si disponible */}
-              {selectedPayment.transaction_id && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border-2 border-[#D4AF37]">
-                  <Label className="text-sm text-muted-foreground">ID de Transaction Soumis</Label>
-                  <div className="font-mono font-bold text-xl mt-2" style={{ color: '#D4AF37' }}>
-                    {selectedPayment.transaction_id}
+              {/* Transaction ID - Toujours visible en haut */}
+              <div className="bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 p-6 rounded-lg border-2 border-[#D4AF37] shadow-lg">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                      ID de Transaction
+                    </Label>
+                    {selectedPayment.transaction_id ? (
+                      <div className="font-mono font-bold text-2xl mt-2" style={{ color: '#D4AF37' }}>
+                        {selectedPayment.transaction_id}
+                      </div>
+                    ) : (
+                      <Input
+                        placeholder="Entrez l'ID de transaction"
+                        value={adminTransactionId}
+                        onChange={(e) => setAdminTransactionId(e.target.value)}
+                        className="mt-2 font-mono text-lg"
+                      />
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    ⚠️ Vérifiez cet ID dans votre système bancaire avant de valider
+                  <Badge 
+                    variant="outline" 
+                    className="bg-green-500/10 text-green-700 border-green-500"
+                  >
+                    {selectedPayment.transaction_id ? 'Soumis par client' : 'À saisir'}
+                  </Badge>
+                </div>
+                {selectedPayment.transaction_id && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-2">
+                    <AlertCircle className="h-3 w-3" />
+                    Vérifiez cet ID dans votre système bancaire avant de valider
                   </p>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Informations utilisateur */}
-              {selectedPayment.user_info && Object.keys(selectedPayment.user_info).length > 0 && (
-                <div>
-                  <Label>Informations de Contact</Label>
-                  <div className="text-sm space-y-1 mt-2 bg-muted p-3 rounded">
-                    {selectedPayment.user_info.telegram_username && (
-                      <p><strong>📱 Telegram :</strong> {selectedPayment.user_info.telegram_username}</p>
-                    )}
-                    {selectedPayment.user_info.whatsapp_number && (
-                      <p><strong>💬 WhatsApp :</strong> {selectedPayment.user_info.whatsapp_number}</p>
-                    )}
-                    {selectedPayment.user_info.discord_username && (
-                      <p><strong>🎮 Discord :</strong> {selectedPayment.user_info.discord_username}</p>
-                    )}
-                    {selectedPayment.user_info.email && (
-                      <p><strong>📧 Email :</strong> {selectedPayment.user_info.email}</p>
-                    )}
+              {/* Détails de l'offre - Collapsible */}
+              <Collapsible open={showOfferDetails} onOpenChange={setShowOfferDetails}>
+                <Card>
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <CreditCard className="h-5 w-5" style={{ color: '#D4AF37' }} />
+                          Détails de l'Offre
+                        </CardTitle>
+                        {showOfferDetails ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-3 pt-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Nom de l'offre</Label>
+                          <p className="font-semibold text-lg">{selectedPayment.offer.name}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Type</Label>
+                          <p className="font-medium capitalize">{selectedPayment.offer_type || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Montant</Label>
+                          <p className="font-bold text-2xl" style={{ color: '#D4AF37' }}>
+                            {selectedPayment.amount} {selectedPayment.currency}
+                          </p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Statut</Label>
+                          <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+
+              {/* Informations utilisateur - Collapsible */}
+              <Collapsible open={showUserInfo} onOpenChange={setShowUserInfo}>
+                <Card>
+                  <CollapsibleTrigger className="w-full">
+                    <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Users className="h-5 w-5" style={{ color: '#D4AF37' }} />
+                          Informations Client
+                        </CardTitle>
+                        {showUserInfo ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                      </div>
+                    </CardHeader>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <CardContent className="space-y-4 pt-0">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Nom</Label>
+                          <p className="font-semibold">{selectedPayment.user_info?.full_name || selectedPayment.user.name}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground uppercase">Email</Label>
+                          <p className="font-medium">{selectedPayment.user_info?.email || selectedPayment.user.email}</p>
+                        </div>
+                      </div>
+
+                      {selectedPayment.user_info && (
+                        <div className="border-t pt-4">
+                          <Label className="text-sm font-semibold mb-3 block">Méthodes de Contact</Label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {selectedPayment.user_info.telegram_username && (
+                              <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <MessageSquare className="h-5 w-5 text-blue-600" />
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Telegram</p>
+                                  <p className="font-mono font-semibold text-blue-700">{selectedPayment.user_info.telegram_username}</p>
+                                </div>
+                              </div>
+                            )}
+                            {selectedPayment.user_info.whatsapp_number && (
+                              <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                <Phone className="h-5 w-5 text-green-600" />
+                                <div>
+                                  <p className="text-xs text-muted-foreground">WhatsApp</p>
+                                  <p className="font-semibold text-green-700">{selectedPayment.user_info.whatsapp_number}</p>
+                                </div>
+                              </div>
+                            )}
+                            {selectedPayment.user_info.discord_username && (
+                              <div className="flex items-center gap-3 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                                <MessageCircle className="h-5 w-5 text-indigo-600" />
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Discord</p>
+                                  <p className="font-mono font-semibold text-indigo-700">{selectedPayment.user_info.discord_username}</p>
+                                </div>
+                              </div>
+                            )}
+                            {selectedPayment.user_info.phone && (
+                              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900/20 rounded-lg">
+                                <Phone className="h-5 w-5 text-gray-600" />
+                                <div>
+                                  <p className="text-xs text-muted-foreground">Téléphone</p>
+                                  <p className="font-semibold text-gray-700">{selectedPayment.user_info.phone}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+
+              {/* Notes et Actions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Notes et Validation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="admin-notes">Notes Admin (optionnel)</Label>
+                    <Textarea
+                      id="admin-notes"
+                      placeholder="Ajoutez des notes pour la facture ou le client..."
+                      value={adminNotes}
+                      onChange={(e) => setAdminNotes(e.target.value)}
+                      rows={3}
+                      className="mt-2"
+                    />
                   </div>
-                </div>
-              )}
 
-              <div>
-                <Label htmlFor="admin-notes">Notes Admin (optionnel)</Label>
-                <Textarea
-                  id="admin-notes"
-                  placeholder="Ajoutez des notes pour la facture ou le client..."
-                  value={adminNotes}
-                  onChange={(e) => setAdminNotes(e.target.value)}
-                  rows={3}
-                />
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm">
-                <p className="font-medium mb-1">✨ Actions automatiques après validation :</p>
-                <ul className="text-muted-foreground space-y-1">
-                  <li>• Génération facture PDF (numéro CT-XXXXX)</li>
-                  <li>• Envoi email avec facture en pièce jointe</li>
-                  <li>• Notification Telegram (si configuré)</li>
-                  <li>• Activation abonnement automatique</li>
-                </ul>
-              </div>
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                    <p className="font-semibold mb-2 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Actions Automatiques
+                    </p>
+                    <ul className="text-sm text-muted-foreground space-y-1.5">
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-0.5">•</span>
+                        <span>Génération facture PDF avec numéro <strong>CT-XXXXX</strong></span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-0.5">•</span>
+                        <span>Envoi email à <strong>{selectedPayment.user_info?.email || selectedPayment.user.email}</strong> avec PDF en pièce jointe</span>
+                      </li>
+                      {selectedPayment.user_info?.telegram_username && (
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 mt-0.5">•</span>
+                          <span>Notification Telegram à <strong>{selectedPayment.user_info.telegram_username}</strong></span>
+                        </li>
+                      )}
+                      <li className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-0.5">•</span>
+                        <span>Activation automatique de l'abonnement</span>
+                      </li>
+                      {selectedPayment.user_info?.telegram_username && selectedPayment.offer_type?.includes('signal') && (
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 mt-0.5">•</span>
+                          <span>Ajout au canal Telegram des signaux</span>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setValidateDialogOpen(false)}>
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setValidateDialogOpen(false)} className="w-full sm:w-auto">
               Annuler
             </Button>
             <Button 
               onClick={handleValidatePayment}
+              disabled={!selectedPayment?.transaction_id && !adminTransactionId.trim()}
               style={{ backgroundColor: '#D4AF37', color: '#000000' }}
+              className="w-full sm:w-auto hover:opacity-90"
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Valider et Envoyer Facture
