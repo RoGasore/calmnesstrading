@@ -51,8 +51,12 @@ python manage.py create_customer_service
 echo "👥 Création de l'utilisateur de test..."
 python manage.py create_test_user
 
+# Créer l'offre de test 10 minutes (pour les tests)
+echo "🎯 Création de l'offre de test 10 minutes..."
+python manage.py create_test_offer_10min || echo "⚠️  Offre déjà existante ou erreur"
+
 # Note: Les données CMS sont gérées via l'interface d'administration
 
-# Démarrer l'application
-echo "🌐 Démarrage du serveur..."
-python manage.py runserver 0.0.0.0:$PORT
+# Démarrer l'application avec Gunicorn (production)
+echo "🌐 Démarrage du serveur Gunicorn..."
+gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT
