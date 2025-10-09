@@ -43,17 +43,23 @@ const Admin = () => {
     if (user !== null) {
       setIsCheckingAuth(false);
       
-      // Si c'est un service client, rediriger vers /support
-      if (user.is_customer_service || user.role === 'customer_service') {
+      // PRIORITÉ 1: Si c'est un service client, rediriger vers /support
+      if (user.role === 'customer_service' || user.is_customer_service) {
+        console.log('User is customer_service, redirecting to /support');
         navigate("/support");
         return;
       }
       
-      // Si ce n'est ni admin ni superuser, rediriger vers home
-      if (!user.is_admin_user && user.role !== 'admin' && !user.is_superuser) {
+      // PRIORITÉ 2: Si c'est un admin ou superuser ou staff (mais PAS service client)
+      const isAdminUser = user.is_admin_user || user.role === 'admin' || user.is_superuser || user.is_staff;
+      
+      if (!isAdminUser) {
+        console.log('User is not admin, redirecting to home');
         navigate("/");
         return;
       }
+      
+      console.log('User is admin, staying on /admin');
     }
   }, [user, navigate]);
 
